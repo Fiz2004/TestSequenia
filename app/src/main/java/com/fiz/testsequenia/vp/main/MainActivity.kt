@@ -6,6 +6,7 @@ import com.fiz.testsequenia.R
 
 class MainActivity : AppCompatActivity(),IMainView {
     private var mainPresenter: MainPresenter? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
