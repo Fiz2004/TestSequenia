@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.net.toUri
+import com.bumptech.glide.Glide
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
 import com.fiz.testsequenia.vp.movies.MoviesPresenter
 
@@ -21,11 +23,21 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
         _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
-        val id = "NumCorrect: ${args.id}"
-        Toast.makeText(context, "${args.id}", Toast.LENGTH_LONG).show()
 
         movieDetailsPresenter = MovieDetailsPresenter(this)
+        val movie=movieDetailsPresenter!!.moviesRepository.listResult.films.first{args.id==it.id}
 
+        binding.localizedNameTextView.text=movie.localizedName
+        binding.yearTextView.text=movie.year.toString()
+        binding.ratingTextView.text=movie.rating.toString()
+        binding.descriptionTextView.text=movie.description
+
+        val imgUri = movie.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
+        movie.imageUrl?.let {
+            Glide.with(binding.imageUrl.context)
+                .load(imgUri)
+                .into(binding.imageUrl)
+        }
 
         return binding.root
     }

@@ -17,10 +17,11 @@ private val ITEM_VIEW_TYPE_MOVIE = 2
 class MoviesAdapter(
     private val genre: List<String>,
     private val movies: List<MovieProperty>,
+    val positionSelected: Int?,
     val callback: (Int) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    lateinit var data: List<DataItem>
+    var data: List<DataItem> = listOf()
 
     fun addHeaderAndSubmitList() {
         data =
@@ -53,10 +54,13 @@ class MoviesAdapter(
                 holder.bind((data[position] as DataItem.Header).title)
             }
             is GenreViewHolder -> {
-                holder.bind((data[position] as DataItem.GenreItem).genre,callback)
+                if (positionSelected == position - 1)
+                    holder.bind((data[position] as DataItem.GenreItem).genre, true, callback)
+                else
+                    holder.bind((data[position] as DataItem.GenreItem).genre, false, callback)
             }
             is MovieViewHolder -> {
-                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty,callback)
+                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty, callback)
             }
         }
     }
@@ -77,11 +81,15 @@ class MoviesAdapter(
     class GenreViewHolder(val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
 
-        fun bind(item: String,callback: (Int) -> Unit) {
+        fun bind(item: String, selected: Boolean, callback: (Int) -> Unit) {
             this.item = item
             binding.genreButton.text = item
+            binding.genreButton.isChecked = selected
             binding.genreButton.setOnClickListener {
                 callback(layoutPosition)
+            }
+            binding.genreButton.setOnCheckedChangeListener { compoundButton, b ->
+
             }
         }
 
@@ -90,9 +98,8 @@ class MoviesAdapter(
     class MovieViewHolder(val binding: ListItemMovieBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: MovieProperty? = null
 
-        fun bind(item: MovieProperty,callback: (Int) -> Unit) {
+        fun bind(item: MovieProperty, callback: (Int) -> Unit) {
             this.item = item
-            item.imageUrl
             val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
             item.imageUrl?.let {
                 Glide.with(binding.imgMovie.context)

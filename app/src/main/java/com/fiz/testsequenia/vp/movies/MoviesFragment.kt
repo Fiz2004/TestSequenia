@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.model.network.models.MovieProperty
 import com.fiz.testsequenia.model.network.models.MoviesProperty
+import java.text.FieldPosition
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
@@ -32,23 +33,21 @@ class MoviesFragment : Fragment(), IMoviesView {
         return binding.root
     }
 
-    private fun initUI(genres:List<String>,movies:List<MovieProperty>) {
+    private fun initUI(genres:List<String>,movies:List<MovieProperty>,position: Int?=null) {
 
-        adapter = MoviesAdapter(genres,movies) { position: Int ->
-            if (position<genres.size){
+        adapter = MoviesAdapter(genres,movies,position) { position: Int ->
+            if (position<=genres.size){
                 val currentposition=position-1
                 val genreSelected=genres[currentposition]
                 val filterMovies=sortMovies.filter { it.genres.contains(genreSelected) }
-                initUI(genres,filterMovies)
+                initUI(genres,filterMovies,currentposition)
             }else{
                 val currentposition=position-genres.size-2
                 this@MoviesFragment.findNavController()
                     .navigate(
-                        MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(currentposition)
+                        MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(movies[currentposition].id)
                     )
             }
-            Toast.makeText(context, "${position}", Toast.LENGTH_LONG).show()
-//            sleepTrackerViewModel.onSleepNightClicked(nightId)
         }
         adapter.addHeaderAndSubmitList()
 
@@ -69,6 +68,12 @@ class MoviesFragment : Fragment(), IMoviesView {
     //TODO Когда возвращаемся
     override fun onStart() {
         super.onStart()
+        if (this::genres.isInitialized&&this::sortMovies.isInitialized)
+        initUI(genres,sortMovies)
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 
     override fun onDestroyView() {

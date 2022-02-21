@@ -9,7 +9,7 @@
 
     <com.google.android.material.chip.Chip
         android:id="@+id/genreButton"
-        style="@style/Widget.Material3.Chip.Suggestion"
+        style="@style/Widget.Material3.Chip.Filter"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
