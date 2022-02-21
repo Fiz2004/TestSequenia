@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
 import com.fiz.testsequenia.vp.movies.MoviesPresenter
 
@@ -21,6 +22,7 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
         val id = "NumCorrect: ${args.id}"
+        Toast.makeText(context, "${args.id}", Toast.LENGTH_LONG).show()
 
         movieDetailsPresenter = MovieDetailsPresenter(this)
 

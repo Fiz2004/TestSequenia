@@ -6,11 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.model.network.models.MovieProperty
 import com.fiz.testsequenia.model.network.models.MoviesProperty
-import java.util.concurrent.Executors
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
@@ -18,6 +18,8 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     private var moviesPresenter: MoviesPresenter? = null
     private lateinit var adapter: MoviesAdapter
+    private lateinit var genres:List<String>
+    private lateinit var sortMovies:List<MovieProperty>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,32 +27,27 @@ class MoviesFragment : Fragment(), IMoviesView {
     ): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
 
-        initUI(null)
-
-//        binding.playButton.setOnClickListener { view: View ->
-//            view.findNavController()
-//                .navigate(
-//                    MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment("1")
-//                )
-//        }
-
-
         moviesPresenter = MoviesPresenter(this)
 
         return binding.root
     }
 
-    private fun initUI(listResult: MoviesProperty?) {
-        if (listResult == null) return
+    private fun initUI(genres:List<String>,movies:List<MovieProperty>) {
 
-        val allGenres:MutableSet<String> = mutableSetOf()
-
-        listResult.films.map{ movie -> movie.genres.forEach { allGenres.add(it) }}
-
-        val movies = listResult.films
-
-        adapter = MoviesAdapter(allGenres.distinct(),movies) { position: Int ->
-            Toast.makeText(context, "${id}", Toast.LENGTH_LONG).show()
+        adapter = MoviesAdapter(genres,movies) { position: Int ->
+            if (position<genres.size){
+                val currentposition=position-1
+                val genreSelected=genres[currentposition]
+                val filterMovies=sortMovies.filter { it.genres.contains(genreSelected) }
+                initUI(genres,filterMovies)
+            }else{
+                val currentposition=position-genres.size-2
+                this@MoviesFragment.findNavController()
+                    .navigate(
+                        MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(currentposition)
+                    )
+            }
+            Toast.makeText(context, "${position}", Toast.LENGTH_LONG).show()
 //            sleepTrackerViewModel.onSleepNightClicked(nightId)
         }
         adapter.addHeaderAndSubmitList()
@@ -58,8 +55,8 @@ class MoviesFragment : Fragment(), IMoviesView {
         val manager = GridLayoutManager(activity, 2)
         manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int) = when (position) {
-                0, allGenres.size + 1 -> 2
-                in 1..allGenres.size -> 2
+                0, genres.size + 1 -> 2
+                in 1..genres.size -> 2
                 else -> 1
             }
         }
@@ -67,6 +64,11 @@ class MoviesFragment : Fragment(), IMoviesView {
                 binding.moviesRecyclerView.layoutManager = manager
                 binding.moviesRecyclerView.adapter = adapter
             }
+    }
+
+    //TODO Когда возвращаемся
+    override fun onStart() {
+        super.onStart()
     }
 
     override fun onDestroyView() {
@@ -78,6 +80,15 @@ class MoviesFragment : Fragment(), IMoviesView {
     }
 
     override fun showMovies(listResult: MoviesProperty) {
-        initUI(listResult)
+        val allGenres:MutableSet<String> = mutableSetOf()
+
+        listResult.films.map{ movie -> movie.genres.forEach { allGenres.add(it) }}
+
+        genres=allGenres.distinct()
+
+        val movies = listResult.films
+        sortMovies=movies.sortedBy { it.localizedName }
+
+        initUI(genres,sortMovies)
     }
 }

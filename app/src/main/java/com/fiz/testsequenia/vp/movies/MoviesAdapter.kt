@@ -2,7 +2,9 @@ package com.fiz.testsequenia.vp.movies
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
@@ -51,10 +53,10 @@ class MoviesAdapter(
                 holder.bind((data[position] as DataItem.Header).title)
             }
             is GenreViewHolder -> {
-                holder.bind((data[position] as DataItem.GenreItem).genre)
+                holder.bind((data[position] as DataItem.GenreItem).genre,callback)
             }
             is MovieViewHolder -> {
-                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty)
+                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty,callback)
             }
         }
     }
@@ -75,9 +77,12 @@ class MoviesAdapter(
     class GenreViewHolder(val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
 
-        fun bind(item: String) {
+        fun bind(item: String,callback: (Int) -> Unit) {
             this.item = item
             binding.genreButton.text = item
+            binding.genreButton.setOnClickListener {
+                callback(layoutPosition)
+            }
         }
 
     }
@@ -85,9 +90,17 @@ class MoviesAdapter(
     class MovieViewHolder(val binding: ListItemMovieBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: MovieProperty? = null
 
-        fun bind(item: MovieProperty) {
+        fun bind(item: MovieProperty,callback: (Int) -> Unit) {
             this.item = item
+            item.imageUrl
+            val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
+            item.imageUrl?.let {
+                Glide.with(binding.imgMovie.context)
+                    .load(imgUri)
+                    .into(binding.imgMovie)
+            }
             binding.nameMovie.text = item.name
+            binding.root.setOnClickListener { callback(layoutPosition) }
         }
     }
 }
