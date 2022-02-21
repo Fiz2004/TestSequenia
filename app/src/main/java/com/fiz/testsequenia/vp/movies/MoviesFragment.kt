@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
+import com.fiz.testsequenia.model.network.models.MoviesProperty
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
@@ -39,5 +40,9 @@ class MoviesFragment : Fragment(), IMoviesView {
 
         moviesPresenter?.destroy()
         moviesPresenter = null
+    }
+
+    override fun showMovies(listResult: MoviesProperty) {
+        listResult
     }
 }

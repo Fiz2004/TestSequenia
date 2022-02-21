@@ -24,6 +24,7 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
 
         movieDetailsPresenter = MovieDetailsPresenter(this)
 
+
         return binding.root
     }
 
