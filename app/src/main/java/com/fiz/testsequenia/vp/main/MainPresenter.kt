@@ -5,7 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainPresenter {
+class MainPresenter(val view:IMainView) {
     fun loadDataMovies() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -17,4 +17,13 @@ class MainPresenter {
 
         }
     }
+
+    fun detachView() {
+
+    }
+
+    fun destroy() {
+
+    }
+
 }

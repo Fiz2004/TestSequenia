@@ -1,6 +1,6 @@
 package com.fiz.testsequenia.model.network
 
-import com.squareup.moshi.Json
+import com.fiz.testsequenia.model.network.models.MoviesProperty
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import retrofit2.Retrofit
@@ -18,25 +18,6 @@ private val retrofit = Retrofit.Builder()
     .addConverterFactory(MoshiConverterFactory.create(moshi))
     .baseUrl(BASE_URL)
     .build()
-
-
-
-data class MovieProperty(
-    val id: Int,
-    @Json(name = "localized_name") val localizedName: String,
-    val name: String,
-    val year: Int,
-    val rating: Double?,
-    @Json(name = "image_url") val imageUrl: String?,
-    val description: String?,
-    val genres:List<String>
-)
-
-//@JsonClass(generateAdapter = true)
-data class MoviesProperty(
-    val films:List<MovieProperty>
-)
-
 
 interface MoviesApiService {
     @GET("sequeniatesttask/films.json")
