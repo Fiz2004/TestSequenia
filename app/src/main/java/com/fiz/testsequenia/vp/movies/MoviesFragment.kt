@@ -1,17 +1,14 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
+import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.model.network.models.MovieProperty
 import com.fiz.testsequenia.model.network.models.MoviesProperty
-import java.text.FieldPosition
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
@@ -33,15 +30,20 @@ class MoviesFragment : Fragment(), IMoviesView {
         return binding.root
     }
 
-    private fun initUI(genres:List<String>,movies:List<MovieProperty>,position: Int?=null) {
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 
-        adapter = MoviesAdapter(genres,movies,position) { position: Int ->
-            if (position<=genres.size){
-                val currentposition=position-1
-                val genreSelected=genres[currentposition]
-                val filterMovies=sortMovies.filter { it.genres.contains(genreSelected) }
-                initUI(genres,filterMovies,currentposition)
-            }else{
+    private fun initUI(genres: List<String>, movies: List<MovieProperty>, position: Int? = null) {
+
+        adapter = MoviesAdapter(genres, movies, position) { position: Int ->
+            if (position <= genres.size) {
+                val currentposition = position - 1
+                val genreSelected = genres[currentposition]
+                val filterMovies = sortMovies.filter { it.genres.contains(genreSelected) }
+                initUI(genres, filterMovies, currentposition)
+            } else {
                 val currentposition=position-genres.size-2
                 this@MoviesFragment.findNavController()
                     .navigate(
@@ -70,10 +72,6 @@ class MoviesFragment : Fragment(), IMoviesView {
         super.onStart()
         if (this::genres.isInitialized&&this::sortMovies.isInitialized)
         initUI(genres,sortMovies)
-    }
-
-    override fun onResume() {
-        super.onResume()
     }
 
     override fun onDestroyView() {
