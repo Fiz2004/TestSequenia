@@ -27,6 +27,8 @@ class MoviesFragment : Fragment(), IMoviesView {
 
         moviesPresenter = MoviesPresenter(this)
 
+        binding.topAppBar.title = "Главная"
+
         return binding.root
     }
 

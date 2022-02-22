@@ -22,30 +22,32 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
 
         movieDetailsPresenter = MovieDetailsPresenter(this)
-        val movie = movieDetailsPresenter!!.moviesRepository.listResult.films.first { args.id == it.id }
+        val movie = movieDetailsPresenter!!.moviesRepository.listResult?.films?.first { args.id == it.id }
 
-        binding.localizedNameTextView.text = movie.localizedName
-        binding.yearTextView.text = movie.year.toString()
-        binding.ratingTextView.text = movie.rating.toString()
-        binding.descriptionTextView.text = movie.description
+        binding.localizedNameTextView.text = movie?.localizedName
+        binding.yearTextView.text = movie?.year.toString()
+        binding.ratingTextView.text = movie?.rating.toString()
+        binding.descriptionTextView.text = movie?.description
+
+        binding.topAppBar.title = movie?.name
 
         binding.topAppBar.setNavigationOnClickListener {
             this@MovieDetailsFragment.parentFragmentManager.popBackStack()
         }
 
-        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.new_crime -> {
-                    true
-                }
-                else -> {
-                    true
-                }
-            }
-        }
+//        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
+//            when (menuItem.itemId) {
+//                R.id.new_crime -> {
+//                    true
+//                }
+//                else -> {
+//                    true
+//                }
+//            }
+//        }
 
-        val imgUri = movie.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
-        movie.imageUrl?.let {
+        val imgUri = movie?.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
+        movie?.imageUrl?.let {
             Glide.with(binding.imageUrl.context)
                 .load(imgUri)
                 .into(binding.imageUrl)

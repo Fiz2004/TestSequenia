@@ -7,25 +7,26 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MoviesRepository (private val context: Context) {
+class MoviesRepository(private val context: Context) {
 
-    lateinit var listResult: MoviesProperty
+    var listResult: MoviesProperty? = null
     lateinit var presenter: IPresenter
 
     fun loadDataMovies() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                listResult = MoviesApi.retrofitService.getProperties()
-                presenter.loadMovies(listResult)
-            } catch (e: Exception) {
-                e.message
-            }
+        if (listResult == null)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    listResult = MoviesApi.retrofitService.getProperties()
+                    presenter.loadMovies(listResult!!)
+                } catch (e: Exception) {
+                    e.message
+                }
 
-        }
+            }
     }
 
     fun addPresenter(moviesPresenter: IPresenter) {
-        presenter=moviesPresenter
+        presenter = moviesPresenter
     }
 
     companion object {

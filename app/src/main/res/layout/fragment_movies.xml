@@ -15,11 +15,9 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            style="?attr/toolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:menu="@menu/menu"
-            app:navigationIcon="@drawable/ic_launcher_background"
             app:title="page" />
     </com.google.android.material.appbar.AppBarLayout>
 
