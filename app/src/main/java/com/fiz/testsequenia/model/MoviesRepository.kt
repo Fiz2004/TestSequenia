@@ -10,19 +10,30 @@ import kotlinx.coroutines.launch
 class MoviesRepository(private val context: Context) {
 
     var listResult: MoviesProperty? = null
-    lateinit var presenter: IPresenter
+    var presenter: IPresenter? = null
+    var start = false
 
     fun loadDataMovies() {
         if (listResult == null)
             CoroutineScope(Dispatchers.IO).launch {
                 try {
+                    start = true
                     listResult = MoviesApi.retrofitService.getProperties()
-                    presenter.loadMovies(listResult!!)
+                    presenter?.loadMovies(listResult!!)
                 } catch (e: Exception) {
                     e.message
                 }
 
             }
+    }
+
+    fun getDataMovies(): MoviesProperty? {
+        if (!start) {
+            loadDataMovies()
+            return null
+        }
+        else {
+            return listResult}
     }
 
     fun addPresenter(moviesPresenter: IPresenter) {

@@ -7,9 +7,11 @@ import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
 import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
+import com.fiz.testsequenia.vp.movies.MoviesFragmentDirections
 
 class MovieDetailsFragment : Fragment(),IMovieDetailsView {
     private var _binding: FragmentMovieDetailsBinding? = null
@@ -35,7 +37,10 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
         binding.topAppBar.title = movie?.name
 
         binding.topAppBar.setNavigationOnClickListener {
-            this@MovieDetailsFragment.parentFragmentManager.popBackStack()
+            this@MovieDetailsFragment.findNavController()
+                .navigate(
+                    MovieDetailsFragmentDirections.actionMovieDetailsFragmentToMoviesFragment()
+                )
         }
 
         val imgUri = movie?.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()

@@ -9,9 +9,10 @@
 
     <com.google.android.material.chip.Chip
         android:id="@+id/genreButton"
-        style="@style/Widget.Material3.Chip.Filter"
+        style="@style/Widget.Material3.Chip.Suggestion"
         android:layout_height="match_parent"
         android:layout_width="0dp"
+        android:checkable="true"
         android:padding="8dp"
         android:layout_weight="1" />
 

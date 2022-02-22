@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.model.network.models.MovieProperty
-import com.fiz.testsequenia.model.network.models.MoviesProperty
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
@@ -16,8 +15,14 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     private var moviesPresenter: MoviesPresenter? = null
     private lateinit var adapter: MoviesAdapter
-    private lateinit var genres:List<String>
-    private lateinit var sortMovies:List<MovieProperty>
+    private var position:Int?=null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState!=null){
+            position = savedInstanceState.getInt("position")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -25,9 +30,7 @@ class MoviesFragment : Fragment(), IMoviesView {
     ): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
 
-        moviesPresenter = MoviesPresenter(this)
-
-        binding.topAppBar.title = "Главная"
+        initUI()
 
         return binding.root
     }
@@ -37,22 +40,17 @@ class MoviesFragment : Fragment(), IMoviesView {
         super.onCreateOptionsMenu(menu, inflater)
     }
 
-    private fun initUI(genres: List<String>, movies: List<MovieProperty>, position: Int? = null) {
+    private fun initUI() {
+        binding.topAppBar.title = "Главная"
 
-        adapter = MoviesAdapter(genres, movies, position) { position: Int ->
-            if (position <= genres.size) {
-                val currentposition = position - 1
-                val genreSelected = genres[currentposition]
-                val filterMovies = sortMovies.filter { it.genres.contains(genreSelected) }
-                initUI(genres, filterMovies, currentposition)
-            } else {
-                val currentposition=position-genres.size-2
-                this@MoviesFragment.findNavController()
-                    .navigate(
-                        MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(movies[currentposition].id)
-                    )
-            }
-        }
+        if (moviesPresenter==null)
+            moviesPresenter = MoviesPresenter(this,position)
+    }
+
+    private fun updateUI(genres: List<String>, movies: List<MovieProperty>, position: Int? = null) {
+
+        val call: (Int) -> Unit = callBackClick(genres, movies)
+        adapter = MoviesAdapter(genres, movies, position, call)
         adapter.addHeaderAndSubmitList()
 
         val manager = GridLayoutManager(activity, 2)
@@ -63,37 +61,50 @@ class MoviesFragment : Fragment(), IMoviesView {
                 else -> 1
             }
         }
-            binding.moviesRecyclerView.post {
-                binding.moviesRecyclerView.layoutManager = manager
-                binding.moviesRecyclerView.adapter = adapter
-            }
+        binding.moviesRecyclerView.post {
+            binding.moviesRecyclerView.layoutManager = manager
+            binding.moviesRecyclerView.adapter = adapter
+        }
     }
 
-    //TODO Когда возвращаемся
+    private fun callBackClick(
+        genres: List<String>,
+        movies: List<MovieProperty>): (Int) -> Unit {
+        return fun(position: Int) {
+            if (position <= genres.size) {
+                moviesPresenter?.clickGenre(position - 1)
+            } else {
+                val currentPosition = position - genres.size - 2
+                this@MoviesFragment.findNavController()
+                    .navigate(
+                        MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(movies[currentPosition].id)
+                    )
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        if (this::genres.isInitialized&&this::sortMovies.isInitialized)
-        initUI(genres,sortMovies)
+        moviesPresenter?.onStart()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        moviesPresenter?.onSaveInstanceState(outState)
+    }
+
+    override fun onDetach() {
+        super.onDetach()
         moviesPresenter?.destroy()
         moviesPresenter = null
     }
 
-    override fun showMovies(listResult: MoviesProperty) {
-        val allGenres:MutableSet<String> = mutableSetOf()
-
-        listResult.films.map{ movie -> movie.genres.forEach { allGenres.add(it) }}
-
-        genres=allGenres.distinct()
-
-        val movies = listResult.films
-        sortMovies=movies.sortedBy { it.localizedName }
-
-        initUI(genres,sortMovies)
+    override fun showMovies(genres: List<String>, sortMovies: List<MovieProperty>, currentPosition: Int?) {
+        updateUI(genres, sortMovies, currentPosition)
     }
 }

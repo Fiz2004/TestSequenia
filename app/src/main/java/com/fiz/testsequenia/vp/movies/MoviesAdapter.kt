@@ -84,12 +84,13 @@ class MoviesAdapter(
         fun bind(item: String, selected: Boolean, callback: (Int) -> Unit) {
             this.item = item
             binding.genreButton.text = item
+            if (selected==true)
             binding.genreButton.isChecked = selected
             binding.genreButton.setOnClickListener {
                 callback(layoutPosition)
             }
             binding.genreButton.setOnCheckedChangeListener { compoundButton, b ->
-
+                val a = 1
             }
         }
 
