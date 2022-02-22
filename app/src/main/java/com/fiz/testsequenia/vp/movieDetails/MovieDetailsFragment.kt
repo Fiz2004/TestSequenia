@@ -38,9 +38,7 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
 
         binding.topAppBar.setNavigationOnClickListener {
             this@MovieDetailsFragment.findNavController()
-                .navigate(
-                    MovieDetailsFragmentDirections.actionMovieDetailsFragmentToMoviesFragment()
-                )
+                .popBackStack()
         }
 
         val imgUri = movie?.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
