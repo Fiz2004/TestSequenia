@@ -25,15 +25,15 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
         movieDetailsPresenter = MovieDetailsPresenter(this)
         val movie = movieDetailsPresenter!!.moviesRepository.listResult?.films?.first { args.id == it.id }
 
-        binding.localizedNameTextView.text = movie?.localizedName
+        binding.localizedNameTextView.text = movie?.name
         binding.yearTextView.text = resources.getString(R.string.year, movie?.year)
         if (movie?.rating != null)
-            binding.ratingTextView.text = resources.getString(R.string.rating, movie?.rating)
+            binding.ratingTextView.text = resources.getString(R.string.rating, movie.rating)
         else
             binding.ratingTextView.text = ""
         binding.descriptionTextView.text = movie?.description
 
-        binding.topAppBar.title = movie?.name
+        binding.topAppBar.title = movie?.localizedName
 
         binding.topAppBar.setNavigationOnClickListener {
             this@MovieDetailsFragment.findNavController()
