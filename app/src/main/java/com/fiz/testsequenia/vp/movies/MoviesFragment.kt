@@ -50,7 +50,8 @@ class MoviesFragment : Fragment(), IMoviesView {
     private fun updateUI(genres: List<String>, movies: List<MovieProperty>, position: Int? = null) {
 
         val call: (Int) -> Unit = callBackClick(genres, movies)
-        adapter = MoviesAdapter(genres, movies, position, call)
+        val call1: (Int, String) -> Unit = callBackClick1(genres, movies)
+        adapter = MoviesAdapter(genres, movies, position, call, call1)
         adapter.addHeaderAndSubmitList()
 
         val manager = GridLayoutManager(activity, 2)
@@ -69,17 +70,23 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     private fun callBackClick(
         genres: List<String>,
-        movies: List<MovieProperty>): (Int) -> Unit {
+        movies: List<MovieProperty>
+    ): (Int) -> Unit {
         return fun(position: Int) {
-            if (position <= genres.size) {
-                moviesPresenter?.clickGenre(position - 1)
-            } else {
-                val currentPosition = position - genres.size - 2
-                this@MoviesFragment.findNavController()
-                    .navigate(
-                        MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(movies[currentPosition].id)
-                    )
-            }
+            val currentPosition = position - genres.size - 2
+            this@MoviesFragment.findNavController()
+                .navigate(
+                    MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(movies[currentPosition].id)
+                )
+        }
+    }
+
+    private fun callBackClick1(
+        genres: List<String>,
+        movies: List<MovieProperty>
+    ): (Int, String) -> Unit {
+        return fun(position: Int, genre: String) {
+            moviesPresenter?.clickGenre(position - 1, genre)
         }
     }
 

@@ -41,7 +41,7 @@ class MoviesPresenter(val view: IMoviesView, var positionSelected: Int? = null) 
     fun destroy() {
     }
 
-    fun clickGenre(position: Int) {
+    fun clickGenre(position: Int, genre: String = "") {
         if (genreSelected == listOf(genres[position])) {
             genreSelected = null
             positionSelected = null

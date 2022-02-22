@@ -18,7 +18,8 @@ class MoviesAdapter(
     private val genre: List<String>,
     private val movies: List<MovieProperty>,
     val positionSelected: Int?,
-    val callback: (Int) -> Unit
+    val callback: (Int) -> Unit,
+    val callback1: (Int, String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data: List<DataItem> = listOf()
@@ -54,10 +55,7 @@ class MoviesAdapter(
                 holder.bind((data[position] as DataItem.Header).title)
             }
             is GenreViewHolder -> {
-                if (positionSelected == position - 1)
-                    holder.bind((data[position] as DataItem.GenreItem).genre, true, callback)
-                else
-                    holder.bind((data[position] as DataItem.GenreItem).genre, false, callback)
+                holder.bind((data[position] as DataItem.GenreItem).genre, positionSelected, callback1, position - 1)
             }
             is MovieViewHolder -> {
                 holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty, callback)
@@ -80,14 +78,18 @@ class MoviesAdapter(
 
     class GenreViewHolder(val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
+        var position: Int? = null
 
-        fun bind(item: String, selected: Boolean, callback: (Int) -> Unit) {
+        fun bind(item: String, selected: Int?, callback: (Int, String) -> Unit, position: Int) {
             this.item = item
+            this.position = position
             binding.genreButton.text = item
-            if (selected==true)
-            binding.genreButton.isChecked = selected
+            if (selected == position)
+                binding.genreButton.isChecked = true
             binding.genreButton.setOnClickListener {
-                callback(layoutPosition)
+                val genre = item
+                if (binding.genreButton.isChecked == true)
+                    callback(layoutPosition, genre)
             }
             binding.genreButton.setOnCheckedChangeListener { compoundButton, b ->
                 val a = 1
