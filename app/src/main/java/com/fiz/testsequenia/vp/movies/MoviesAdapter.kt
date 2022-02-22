@@ -106,7 +106,7 @@ class MoviesAdapter(
                     .load(imgUri)
                     .into(binding.imgMovie)
             }
-            binding.nameMovie.text = item.name
+            binding.nameMovie.text = item.localizedName
             binding.root.setOnClickListener { callback(layoutPosition) }
         }
     }

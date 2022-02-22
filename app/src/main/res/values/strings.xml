@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">TestSequenia</string>
+    <string name="year">Год: %1$d</string>
+    <string name="rating">Рейтинг: %1$f</string>
 
 </resources>

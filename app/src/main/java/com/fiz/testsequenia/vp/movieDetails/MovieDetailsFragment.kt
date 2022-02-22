@@ -2,6 +2,9 @@ package com.fiz.testsequenia.vp.movieDetails
 
 import android.os.Bundle
 import android.view.*
+import android.widget.TextView
+import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
+import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
@@ -25,8 +28,8 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
         val movie = movieDetailsPresenter!!.moviesRepository.listResult?.films?.first { args.id == it.id }
 
         binding.localizedNameTextView.text = movie?.localizedName
-        binding.yearTextView.text = movie?.year.toString()
-        binding.ratingTextView.text = movie?.rating.toString()
+        binding.yearTextView.text = resources.getString(R.string.year,movie?.year)
+        binding.ratingTextView.text = resources.getString(R.string.rating,movie?.rating)
         binding.descriptionTextView.text = movie?.description
 
         binding.topAppBar.title = movie?.name
@@ -34,17 +37,6 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
         binding.topAppBar.setNavigationOnClickListener {
             this@MovieDetailsFragment.parentFragmentManager.popBackStack()
         }
-
-//        binding.topAppBar.setOnMenuItemClickListener { menuItem ->
-//            when (menuItem.itemId) {
-//                R.id.new_crime -> {
-//                    true
-//                }
-//                else -> {
-//                    true
-//                }
-//            }
-//        }
 
         val imgUri = movie?.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
         movie?.imageUrl?.let {
