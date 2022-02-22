@@ -2,18 +2,14 @@ package com.fiz.testsequenia.vp.movieDetails
 
 import android.os.Bundle
 import android.view.*
-import android.widget.TextView
-import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_NONE
-import android.widget.TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
-import com.fiz.testsequenia.vp.movies.MoviesFragmentDirections
 
-class MovieDetailsFragment : Fragment(),IMovieDetailsView {
+class MovieDetailsFragment : Fragment(), IMovieDetailsView {
     private var _binding: FragmentMovieDetailsBinding? = null
     private val binding get() = _binding!!
 
@@ -30,8 +26,11 @@ class MovieDetailsFragment : Fragment(),IMovieDetailsView {
         val movie = movieDetailsPresenter!!.moviesRepository.listResult?.films?.first { args.id == it.id }
 
         binding.localizedNameTextView.text = movie?.localizedName
-        binding.yearTextView.text = resources.getString(R.string.year,movie?.year)
-        binding.ratingTextView.text = resources.getString(R.string.rating,movie?.rating)
+        binding.yearTextView.text = resources.getString(R.string.year, movie?.year)
+        if (movie?.rating != null)
+            binding.ratingTextView.text = resources.getString(R.string.rating, movie?.rating)
+        else
+            binding.ratingTextView.text = ""
         binding.descriptionTextView.text = movie?.description
 
         binding.topAppBar.title = movie?.name
