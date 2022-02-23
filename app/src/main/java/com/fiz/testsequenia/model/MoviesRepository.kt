@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MoviesRepository(private val context: Context) {
-
     var listResult: MoviesProperty? = null
     var presenter: IPresenter? = null
     var start = false
@@ -45,6 +44,7 @@ class MoviesRepository(private val context: Context) {
         fun initialize(context: Context) {
             if (INSTANCE == null) {
                 INSTANCE = MoviesRepository(context)
+                INSTANCE?.loadDataMovies()
             }
         }
 
