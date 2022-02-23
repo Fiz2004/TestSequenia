@@ -1,57 +1,67 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
-import com.fiz.testsequenia.model.IPresenter
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.model.MoviesRepository
 import com.fiz.testsequenia.model.network.models.MovieProperty
-import com.fiz.testsequenia.model.network.models.MoviesProperty
 
-class MoviesPresenter(private val view: IMoviesView, private var genreSelected: String? = null) : IPresenter {
+class MoviesPresenter(private val view: IMoviesView, private var genreSelected: String? = null) : IMoviesPresenter {
 
     private val moviesRepository: MoviesRepository = MoviesRepository.get()
-    private lateinit var genres: List<String>
-    private lateinit var sortMovies: List<MovieProperty>
+    private var genres: List<String>? = null
+    private var sortMovies: List<MovieProperty>? = null
 
     private lateinit var filterMovies: List<MovieProperty>
 
-    init {
+    fun onCreateView() {
         moviesRepository.addPresenter(this)
-        val listResult = moviesRepository.getDataMovies()
-        if (listResult != null)
-            loadMovies(listResult)
+        genres = moviesRepository.getGenres()
+        sortMovies = moviesRepository.getSortMovies()
+        if (genres != null && sortMovies != null)
+            loadMovies()
+        view.initUI()
     }
 
-    override fun loadMovies(listResult: MoviesProperty) {
-        val allGenres: MutableSet<String> = mutableSetOf()
-
-        listResult.films.map { movie -> movie.genres.forEach { allGenres.add(it) } }
-
-        genres = allGenres.distinct()
-
-        val movies = listResult.films
-        sortMovies = movies.sortedBy { it.localizedName }
-
+    override fun loadMovies() {
         if (genreSelected != null) {
-            filterMovies = sortMovies.filter { it.genres.contains(genreSelected) }
-            view.showMovies(genres, filterMovies, genreSelected)
+            genres = moviesRepository.getGenres()
+            sortMovies = moviesRepository.getSortMovies()
+            filterMovies = sortMovies!!.filter { it.genres.contains(genreSelected) }
+//            view.updateUI(genres!!, filterMovies, genreSelected)
         } else {
-            view.showMovies(genres, sortMovies)
+            genres = moviesRepository.getGenres()
+            sortMovies = moviesRepository.getSortMovies()
+            view.updateUI(genres!!, sortMovies!!)
         }
-    }
-
-    fun destroy() {
     }
 
     fun clickGenre(genre: String = "") {
         if (genreSelected == genre) {
             genreSelected = null
-            filterMovies = sortMovies
-            view.showMovies(genres, filterMovies)
+            filterMovies = sortMovies!!
+            view.updateUI(genres!!, filterMovies)
         } else {
             genreSelected = genre
-            filterMovies = sortMovies.filter { it.genres.contains(genreSelected) }
-            view.showMovies(genres, filterMovies, genreSelected)
+            filterMovies = sortMovies?.filter { it.genres.contains(genreSelected) }!!
+            view.updateUI(genres!!, filterMovies, genreSelected)
         }
+    }
+
+    fun spanSizeLookup(genres: List<String>) =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) = when (position) {
+                0, genres.size + 1 -> 2
+                in 1..genres.size -> 2
+                else -> 1
+            }
+        }
+
+    fun clickMovie(id: Int) {
+        (view as MoviesFragment).findNavController()
+            .navigate(
+                MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
+            )
     }
 
     fun onSaveInstanceState(outState: Bundle) {
@@ -59,11 +69,15 @@ class MoviesPresenter(private val view: IMoviesView, private var genreSelected: 
     }
 
     fun onStart() {
-        if (this::genres.isInitialized && this::sortMovies.isInitialized)
+        if (genres != null && sortMovies != null)
             if (this::filterMovies.isInitialized)
-                view.showMovies(genres, filterMovies, genreSelected)
+                view.updateUI(genres!!, filterMovies, genreSelected)
             else
-                view.showMovies(genres, sortMovies, genreSelected)
+                view.updateUI(genres!!, sortMovies!!, genreSelected)
+    }
+
+    fun onDestroyView() {
+        moviesRepository.removePresenter()
     }
 
     companion object {

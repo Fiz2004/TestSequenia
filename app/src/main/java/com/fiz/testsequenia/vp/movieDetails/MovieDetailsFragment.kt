@@ -17,13 +17,14 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View? {
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
 
         movieDetailsPresenter = MovieDetailsPresenter(this)
-        val movie = movieDetailsPresenter!!.moviesRepository.listResult?.films?.first { args.id == it.id }
+        val movie = movieDetailsPresenter!!.moviesRepository.getSortMovies()?.first { args.id == it.id }
 
         binding.localizedNameTextView.text = movie?.name
         binding.yearTextView.text = resources.getString(R.string.year, movie?.year)

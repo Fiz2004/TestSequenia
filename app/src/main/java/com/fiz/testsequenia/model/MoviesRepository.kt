@@ -2,41 +2,62 @@ package com.fiz.testsequenia.model
 
 import android.content.Context
 import com.fiz.testsequenia.model.network.MoviesApi
-import com.fiz.testsequenia.model.network.models.MoviesProperty
+import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.vp.movies.IMoviesPresenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MoviesRepository(private val context: Context) {
-    var listResult: MoviesProperty? = null
-    var presenter: IPresenter? = null
-    var start = false
+    private var presenter: IMoviesPresenter? = null
+
+    private var genres: List<String>? = null
+    private var sortMovies: List<MovieProperty>? = null
 
     fun loadDataMovies() {
-        if (listResult == null)
+        if (genres == null || sortMovies == null)
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    start = true
-                    listResult = MoviesApi.retrofitService.getProperties()
-                    presenter?.loadMovies(listResult!!)
+                    val listResult = MoviesApi.retrofitService.getProperties()
+
+                    val allGenres: MutableSet<String> = mutableSetOf()
+
+                    listResult.films.map { movie -> movie.genres.forEach { allGenres.add(it) } }
+
+                    genres = allGenres.distinct()
+
+                    val movies = listResult.films
+                    sortMovies = movies.sortedBy { it.localizedName }
+
+                    presenter?.loadMovies()
                 } catch (e: Exception) {
                     e.message
                 }
-
             }
     }
 
-    fun getDataMovies(): MoviesProperty? {
-        if (!start) {
-            loadDataMovies()
-            return null
+    fun getGenres(): List<String>? {
+        return if (genres == null) {
+            null
+        } else {
+            genres
         }
-        else {
-            return listResult}
     }
 
-    fun addPresenter(moviesPresenter: IPresenter) {
+    fun getSortMovies(): List<MovieProperty>? {
+        return if (sortMovies == null) {
+            null
+        } else {
+            sortMovies
+        }
+    }
+
+    fun addPresenter(moviesPresenter: IMoviesPresenter) {
         presenter = moviesPresenter
+    }
+
+    fun removePresenter() {
+        presenter = null
     }
 
     companion object {

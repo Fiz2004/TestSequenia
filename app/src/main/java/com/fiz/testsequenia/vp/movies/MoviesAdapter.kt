@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.fiz.testsequenia.R
@@ -17,24 +18,32 @@ private const val ITEM_VIEW_TYPE_GENRE = 1
 private const val ITEM_VIEW_TYPE_MOVIE = 2
 
 class MoviesAdapter(
-    private val genre: List<String>,
-    private val movies: List<MovieProperty>,
-    private val genreSelected: String?,
     private val context: Context,
     private val onClickMovie: (Int) -> Unit,
     private val onClickGenre: (String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    private var genre: List<String> = listOf()
+    private var movies: List<MovieProperty> = listOf()
+    private var genreSelected: String? = null
 
     var data: List<DataItem> = listOf()
 
-    fun addHeaderAndSubmitList() {
-        data =
+    fun refreshData(genre: List<String>, movies: List<MovieProperty>, genreSelected: String?) {
+        this.genre = genre
+        this.movies = movies
+        this.genreSelected = genreSelected
+        val newData =
             listOf(DataItem.Header(context.resources.getString(R.string.genres))) +
                     genre.map { DataItem.GenreItem(it) } +
                     listOf(DataItem.Header(context.resources.getString(R.string.movies))) +
                     movies.map {
                         DataItem.MoviePropertyItem(it)
                     }
+
+        val diffCallback = DataDiffCallback(data, newData)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+        data = newData
+        diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -73,7 +82,7 @@ class MoviesAdapter(
         return data.size
     }
 
-    class HeaderViewHolder(val binding: ListItemHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
+    class HeaderViewHolder(private val binding: ListItemHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
 
         fun bind(item: String) {
@@ -82,7 +91,7 @@ class MoviesAdapter(
         }
     }
 
-    class GenreViewHolder(val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
+    class GenreViewHolder(private val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
 
         fun bind(item: String, genreSelected: String?, onClickGenre: (String) -> Unit) {
@@ -97,7 +106,7 @@ class MoviesAdapter(
 
     }
 
-    class MovieViewHolder(val binding: ListItemMovieBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MovieViewHolder(private val binding: ListItemMovieBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: MovieProperty? = null
 
         fun bind(item: MovieProperty, callback: (Int) -> Unit) {
@@ -109,13 +118,37 @@ class MoviesAdapter(
                     .into(binding.imgMovie)
             }
             binding.nameMovie.text = item.localizedName
-            binding.root.setOnClickListener { callback(layoutPosition) }
+            binding.root.setOnClickListener { callback(item.id) }
         }
     }
 }
 
 sealed class DataItem {
+    val rateIndex: Int = 0
+
     data class GenreItem(val genre: String) : DataItem()
     data class MoviePropertyItem(val movieProperty: MovieProperty) : DataItem()
     data class Header(val title: String) : DataItem()
+}
+
+class DataDiffCallback(private val oldList: List<DataItem>, private val newList: List<DataItem>) :
+    DiffUtil.Callback() {
+    override fun getOldListSize() = oldList.size
+
+    override fun getNewListSize() = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        return oldList[oldItemPosition] === newList[newItemPosition]
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        if (oldList[oldItemPosition] is DataItem.Header && newList[newItemPosition] is DataItem.Header)
+            return (oldList[oldItemPosition] as DataItem.Header).title == (newList[newItemPosition] as DataItem.Header).title
+        if (oldList[oldItemPosition] is DataItem.GenreItem && newList[newItemPosition] is DataItem.GenreItem)
+            return (oldList[oldItemPosition] as DataItem.GenreItem).genre == (newList[newItemPosition] as DataItem.GenreItem).genre
+        if (oldList[oldItemPosition] is DataItem.MoviePropertyItem && newList[newItemPosition] is DataItem.MoviePropertyItem)
+            return (oldList[oldItemPosition] as DataItem.MoviePropertyItem).movieProperty.id == (newList[newItemPosition] as DataItem.MoviePropertyItem).movieProperty.id
+        return false
+    }
+
 }
