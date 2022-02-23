@@ -14,13 +14,14 @@ class MoviesFragment : Fragment(), IMoviesView {
     private val binding get() = _binding!!
 
     private var moviesPresenter: MoviesPresenter? = null
+    private var genreSelected: String? = null
+
     private lateinit var adapter: MoviesAdapter
-    private var position:Int?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (savedInstanceState!=null){
-            position = savedInstanceState.getInt("position")
+        if (savedInstanceState != null) {
+            genreSelected = savedInstanceState.getString(MoviesPresenter.KEY_GENRE_SELECTED)
         }
     }
 
@@ -43,15 +44,21 @@ class MoviesFragment : Fragment(), IMoviesView {
     private fun initUI() {
         binding.topAppBar.title = "Главная"
 
-        if (moviesPresenter==null)
-            moviesPresenter = MoviesPresenter(this,position)
+        if (moviesPresenter == null)
+            moviesPresenter = MoviesPresenter(this, genreSelected)
     }
 
-    private fun updateUI(genres: List<String>, movies: List<MovieProperty>, position: Int? = null) {
+    private fun updateUI(genres: List<String>, movies: List<MovieProperty>, genreSelected: String? = null) {
 
-        val call: (Int) -> Unit = callBackClick(genres, movies)
-        val call1: (Int, String) -> Unit = callBackClick1(genres, movies)
-        adapter = MoviesAdapter(genres, movies, position, call, call1)
+        adapter = MoviesAdapter(
+            genres,
+            movies,
+            genreSelected,
+            requireContext().applicationContext,
+            onClickMovie(genres, movies),
+            onClickGenre()
+        )
+
         adapter.addHeaderAndSubmitList()
 
         val manager = GridLayoutManager(activity, 2)
@@ -68,7 +75,7 @@ class MoviesFragment : Fragment(), IMoviesView {
         }
     }
 
-    private fun callBackClick(
+    private fun onClickMovie(
         genres: List<String>,
         movies: List<MovieProperty>
     ): (Int) -> Unit {
@@ -81,12 +88,9 @@ class MoviesFragment : Fragment(), IMoviesView {
         }
     }
 
-    private fun callBackClick1(
-        genres: List<String>,
-        movies: List<MovieProperty>
-    ): (Int, String) -> Unit {
-        return fun(position: Int, genre: String) {
-            moviesPresenter?.clickGenre(position - 1, genre)
+    private fun onClickGenre(): (String) -> Unit {
+        return fun(genre: String) {
+            moviesPresenter?.clickGenre(genre)
         }
     }
 
@@ -111,7 +115,7 @@ class MoviesFragment : Fragment(), IMoviesView {
         moviesPresenter = null
     }
 
-    override fun showMovies(genres: List<String>, sortMovies: List<MovieProperty>, currentPosition: Int?) {
-        updateUI(genres, sortMovies, currentPosition)
+    override fun showMovies(genres: List<String>, sortMovies: List<MovieProperty>, genreSelected: String?) {
+        updateUI(genres, sortMovies, genreSelected)
     }
 }

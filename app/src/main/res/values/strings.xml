@@ -2,5 +2,7 @@
     <string name="app_name">TestSequenia</string>
     <string name="year">Год: %1$d</string>
     <string name="rating">Рейтинг: %1$.3f</string>
+    <string name="genres">Жанры</string>
+    <string name="movies">Фильмы</string>
 
 </resources>

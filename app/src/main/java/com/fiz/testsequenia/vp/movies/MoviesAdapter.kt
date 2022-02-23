@@ -1,34 +1,40 @@
 package com.fiz.testsequenia.vp.movies
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
 import com.fiz.testsequenia.model.network.models.MovieProperty
 
-private val ITEM_VIEW_TYPE_HEADER = 0
-private val ITEM_VIEW_TYPE_GENRE = 1
-private val ITEM_VIEW_TYPE_MOVIE = 2
+private const val ITEM_VIEW_TYPE_HEADER = 0
+private const val ITEM_VIEW_TYPE_GENRE = 1
+private const val ITEM_VIEW_TYPE_MOVIE = 2
 
 class MoviesAdapter(
     private val genre: List<String>,
     private val movies: List<MovieProperty>,
-    val positionSelected: Int?,
-    val callback: (Int) -> Unit,
-    val callback1: (Int, String) -> Unit
+    private val genreSelected: String?,
+    private val context: Context,
+    private val onClickMovie: (Int) -> Unit,
+    private val onClickGenre: (String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     var data: List<DataItem> = listOf()
 
     fun addHeaderAndSubmitList() {
         data =
-            listOf(DataItem.Header("Жанры")) + genre.map { DataItem.GenreItem(it) } + listOf(DataItem.Header("Фильмы")) + movies.map {
-                DataItem.MoviePropertyItem(it)
-            }
+            listOf(DataItem.Header(context.resources.getString(R.string.genres))) +
+                    genre.map { DataItem.GenreItem(it) } +
+                    listOf(DataItem.Header(context.resources.getString(R.string.movies))) +
+                    movies.map {
+                        DataItem.MoviePropertyItem(it)
+                    }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -55,10 +61,10 @@ class MoviesAdapter(
                 holder.bind((data[position] as DataItem.Header).title)
             }
             is GenreViewHolder -> {
-                holder.bind((data[position] as DataItem.GenreItem).genre, positionSelected, callback1, position - 1)
+                holder.bind((data[position] as DataItem.GenreItem).genre, genreSelected, onClickGenre)
             }
             is MovieViewHolder -> {
-                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty, callback)
+                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty, onClickMovie)
             }
         }
     }
@@ -78,21 +84,14 @@ class MoviesAdapter(
 
     class GenreViewHolder(val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
-        var position: Int? = null
 
-        fun bind(item: String, selected: Int?, callback: (Int, String) -> Unit, position: Int) {
+        fun bind(item: String, genreSelected: String?, onClickGenre: (String) -> Unit) {
             this.item = item
-            this.position = position
             binding.genreButton.text = item
-            if (selected == position)
-                binding.genreButton.isChecked = true
+            binding.genreButton.isChecked = genreSelected == item
+
             binding.genreButton.setOnClickListener {
-                val genre = item
-                if (binding.genreButton.isChecked == true)
-                    callback(layoutPosition, genre)
-            }
-            binding.genreButton.setOnCheckedChangeListener { compoundButton, b ->
-                val a = 1
+                onClickGenre(item)
             }
         }
 

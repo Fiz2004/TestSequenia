@@ -6,13 +6,12 @@ import com.fiz.testsequenia.model.MoviesRepository
 import com.fiz.testsequenia.model.network.models.MovieProperty
 import com.fiz.testsequenia.model.network.models.MoviesProperty
 
-class MoviesPresenter(val view: IMoviesView, var positionSelected: Int? = null) : IPresenter {
+class MoviesPresenter(private val view: IMoviesView, private var genreSelected: String? = null) : IPresenter {
 
-    val moviesRepository: MoviesRepository = MoviesRepository.get()
+    private val moviesRepository: MoviesRepository = MoviesRepository.get()
     private lateinit var genres: List<String>
     private lateinit var sortMovies: List<MovieProperty>
 
-    private var genreSelected: List<String>? = null
     private lateinit var filterMovies: List<MovieProperty>
 
     init {
@@ -32,38 +31,42 @@ class MoviesPresenter(val view: IMoviesView, var positionSelected: Int? = null) 
         val movies = listResult.films
         sortMovies = movies.sortedBy { it.localizedName }
 
-        if (positionSelected != null)
-            clickGenre(positionSelected!!)
-        else
+        if (genreSelected != null) {
+            filterMovies = sortMovies.filter { it.genres.contains(genreSelected) }
+            view.showMovies(genres, filterMovies, genreSelected)
+        } else {
             view.showMovies(genres, sortMovies)
+        }
     }
 
     fun destroy() {
     }
 
-    fun clickGenre(position: Int, genre: String = "") {
-        if (genreSelected == listOf(genres[position])) {
+    fun clickGenre(genre: String = "") {
+        if (genreSelected == genre) {
             genreSelected = null
-            positionSelected = null
             filterMovies = sortMovies
             view.showMovies(genres, filterMovies)
         } else {
-            genreSelected = listOf(genres[position])
-            filterMovies = sortMovies.filter { it.genres.contains(genreSelected?.get(0)) }
-            positionSelected = position
-            view.showMovies(genres, filterMovies, position)
+            genreSelected = genre
+            filterMovies = sortMovies.filter { it.genres.contains(genreSelected) }
+            view.showMovies(genres, filterMovies, genreSelected)
         }
     }
 
     fun onSaveInstanceState(outState: Bundle) {
-        positionSelected?.let { outState.putInt("position", it) }
+        genreSelected?.let { outState.putString(KEY_GENRE_SELECTED, it) }
     }
 
     fun onStart() {
         if (this::genres.isInitialized && this::sortMovies.isInitialized)
             if (this::filterMovies.isInitialized)
-                view.showMovies(genres, filterMovies, positionSelected)
+                view.showMovies(genres, filterMovies, genreSelected)
             else
-                view.showMovies(genres, sortMovies, positionSelected)
+                view.showMovies(genres, sortMovies, genreSelected)
+    }
+
+    companion object {
+        const val KEY_GENRE_SELECTED = "genre"
     }
 }
