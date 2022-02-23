@@ -4,5 +4,6 @@
     <string name="rating">Рейтинг: %1$.3f</string>
     <string name="genres">Жанры</string>
     <string name="movies">Фильмы</string>
+    <string name="image_movie">Изображение фильма</string>
 
 </resources>

@@ -52,14 +52,20 @@ class MoviesAdapter(
             ITEM_VIEW_TYPE_HEADER -> HeaderViewHolder(ListItemHeaderBinding.inflate(inflater, parent, false))
             ITEM_VIEW_TYPE_GENRE -> GenreViewHolder(ListItemGenreBinding.inflate(inflater, parent, false))
             ITEM_VIEW_TYPE_MOVIE -> MovieViewHolder(ListItemMovieBinding.inflate(inflater, parent, false))
-            else -> throw ClassCastException("Unknown viewType ${viewType}")
+            else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
 
     override fun getItemViewType(position: Int): Int {
+        if (genre.isNotEmpty())
+            return when (position) {
+                0, genre.size + 1 -> ITEM_VIEW_TYPE_HEADER
+                in 1..genre.size -> ITEM_VIEW_TYPE_GENRE
+                else -> ITEM_VIEW_TYPE_MOVIE
+            }
         return when (position) {
-            0, genre.size + 1 -> ITEM_VIEW_TYPE_HEADER
-            in 1..genre.size -> ITEM_VIEW_TYPE_GENRE
+            0 -> ITEM_VIEW_TYPE_HEADER
+            1 -> ITEM_VIEW_TYPE_GENRE
             else -> ITEM_VIEW_TYPE_MOVIE
         }
     }
@@ -115,6 +121,13 @@ class MoviesAdapter(
             item.imageUrl?.let {
                 Glide.with(binding.imgMovie.context)
                     .load(imgUri)
+                    .placeholder(R.drawable.ic_baseline_cloud_download_24)
+                    .error(R.drawable.ic_baseline_broken_image_24)
+                    .into(binding.imgMovie)
+            }
+            if (item.imageUrl == null) {
+                Glide.with(binding.imgMovie.context)
+                    .load(R.drawable.ic_baseline_broken_image_24)
                     .into(binding.imgMovie)
             }
             binding.nameMovie.text = item.localizedName
@@ -124,8 +137,6 @@ class MoviesAdapter(
 }
 
 sealed class DataItem {
-    val rateIndex: Int = 0
-
     data class GenreItem(val genre: String) : DataItem()
     data class MoviePropertyItem(val movieProperty: MovieProperty) : DataItem()
     data class Header(val title: String) : DataItem()

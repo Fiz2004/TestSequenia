@@ -45,11 +45,11 @@ class MoviesFragment : Fragment(), IMoviesView {
         moviesPresenter?.onStart()
     }
 
-    override fun updateUI(genres: List<String>, movies: List<MovieProperty>, genreSelected: String?) {
+    override fun updateUI(genres: List<String>, sortMovies: List<MovieProperty>, genreSelected: String?) {
         if (!this::adapter.isInitialized) return
         adapter.refreshData(
             genres,
-            movies,
+            sortMovies,
             genreSelected
         )
         manager.spanSizeLookup = moviesPresenter?.spanSizeLookup(genres)
@@ -87,9 +87,6 @@ class MoviesFragment : Fragment(), IMoviesView {
         )
 
         manager = GridLayoutManager(activity, 2)
-
-//        binding.moviesRecyclerView.layoutManager = manager
-//        binding.moviesRecyclerView.adapter = adapter
     }
 
 }

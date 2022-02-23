@@ -32,15 +32,15 @@
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:layout_margin="16dp"
+            android:contentDescription="@string/image_movie"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/localizedNameTextView"
+            android:id="@+id/nameTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="TextView"
             android:textAlignment="viewStart"
             android:textColor="#FFFFFF"
             app:layout_constraintEnd_toEndOf="parent"
@@ -54,12 +54,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="TextView"
             android:textAlignment="viewStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
-            app:layout_constraintTop_toBottomOf="@+id/localizedNameTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/ratingTextView"
@@ -67,7 +66,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:text="TextView"
             android:textAlignment="viewStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -81,7 +79,6 @@
             android:layout_margin="16dp"
             android:padding="16dp"
             android:textColor="#FFFFFF"
-            android:text="TextView"
             android:singleLine="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

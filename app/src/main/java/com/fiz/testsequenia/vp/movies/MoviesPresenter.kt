@@ -28,7 +28,6 @@ class MoviesPresenter(private val view: IMoviesView, private var genreSelected: 
             genres = moviesRepository.getGenres()
             sortMovies = moviesRepository.getSortMovies()
             filterMovies = sortMovies!!.filter { it.genres.contains(genreSelected) }
-//            view.updateUI(genres!!, filterMovies, genreSelected)
         } else {
             genres = moviesRepository.getGenres()
             sortMovies = moviesRepository.getSortMovies()

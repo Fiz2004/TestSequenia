@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
@@ -15,6 +14,12 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
 
     private var movieDetailsPresenter: MovieDetailsPresenter? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        movieDetailsPresenter = MovieDetailsPresenter(this)
+//        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -22,38 +27,53 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
         _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
-
-        movieDetailsPresenter = MovieDetailsPresenter(this)
-        val movie = movieDetailsPresenter!!.moviesRepository.getSortMovies()?.first { args.id == it.id }
-
-        binding.localizedNameTextView.text = movie?.name
-        binding.yearTextView.text = resources.getString(R.string.year, movie?.year)
-        if (movie?.rating != null)
-            binding.ratingTextView.text = resources.getString(R.string.rating, movie.rating)
-        else
-            binding.ratingTextView.text = ""
-        binding.descriptionTextView.text = movie?.description
-
-        binding.topAppBar.title = movie?.localizedName
+        movieDetailsPresenter?.setId(args.id)
+        movieDetailsPresenter?.onCreateView()
 
         binding.topAppBar.setNavigationOnClickListener {
-            this@MovieDetailsFragment.findNavController()
-                .popBackStack()
-        }
-
-        val imgUri = movie?.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
-        movie?.imageUrl?.let {
-            Glide.with(binding.imageUrl.context)
-                .load(imgUri)
-                .into(binding.imageUrl)
+            movieDetailsPresenter?.clickBack()
         }
 
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
+    override fun onSetImage(url: String?) {
+        val imgUri = url?.toUri()?.buildUpon()?.scheme("https")?.build()
+        url?.let {
+            Glide.with(binding.imageUrl.context)
+                .load(imgUri)
+                .placeholder(R.drawable.ic_baseline_cloud_download_24)
+                .error(R.drawable.ic_baseline_broken_image_24)
+                .into(binding.imageUrl)
+        }
+        if (url == null) {
+            Glide.with(binding.imageUrl.context)
+                .load(R.drawable.ic_baseline_broken_image_24)
+                .into(binding.imageUrl)
+        }
+    }
+
+    override fun onSetDescription(description: String) {
+        binding.descriptionTextView.text = description
+    }
+
+    override fun onSetRating(rating: Double?) {
+        binding.ratingTextView.text = if (rating != null)
+            resources.getString(R.string.rating, rating)
+        else
+            ""
+    }
+
+    override fun onSetYear(year: Int) {
+        binding.yearTextView.text = resources.getString(R.string.year, year)
+    }
+
+    override fun onSetName(name: String) {
+        binding.nameTextView.text = name
+    }
+
+    override fun onSetLocalizedName(localizedName: String) {
+        binding.topAppBar.title = localizedName
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -65,7 +85,6 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
         super.onDestroyView()
         _binding = null
 
-        movieDetailsPresenter?.destroy()
         movieDetailsPresenter = null
     }
 
