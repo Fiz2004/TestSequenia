@@ -1,6 +1,9 @@
 package com.fiz.testsequenia.model
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import com.fiz.testsequenia.model.network.MoviesApi
 import com.fiz.testsequenia.model.network.models.MovieProperty
 import com.fiz.testsequenia.vp.movies.IMoviesPresenter
@@ -18,7 +21,8 @@ class MoviesRepository(private val context: Context) {
         if (genres == null || sortMovies == null)
 
             CoroutineScope(Dispatchers.IO).launch {
-                for (n in 0..10)
+                var message:String=""
+                for (n in 0..10) {
                     try {
                         val listResult = MoviesApi.retrofitService.getProperties()
 
@@ -31,11 +35,16 @@ class MoviesRepository(private val context: Context) {
                         val movies = listResult.films
                         sortMovies = movies.sortedBy { it.localizedName }
 
-                        presenter?.loadMovies()
+                        presenter?.onLoadMovies()
                         break
                     } catch (e: Exception) {
-                        e.message
+                        message= e.message.toString()
                     }
+                    if (message!="")
+                        Handler(Looper.getMainLooper()).post {
+                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                        }
+                }
             }
     }
 

@@ -19,11 +19,11 @@ class MoviesPresenter(private val view: IMoviesView, private var genreSelected: 
         genres = moviesRepository.getGenres()
         sortMovies = moviesRepository.getSortMovies()
         if (genres != null && sortMovies != null)
-            loadMovies()
+            onLoadMovies()
         view.initUI()
     }
 
-    override fun loadMovies() {
+    override fun onLoadMovies() {
         if (genreSelected != null) {
             genres = moviesRepository.getGenres()
             sortMovies = moviesRepository.getSortMovies()
