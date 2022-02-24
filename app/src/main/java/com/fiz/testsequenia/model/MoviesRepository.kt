@@ -16,23 +16,26 @@ class MoviesRepository(private val context: Context) {
 
     fun loadDataMovies() {
         if (genres == null || sortMovies == null)
+
             CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val listResult = MoviesApi.retrofitService.getProperties()
+                for (n in 0..10)
+                    try {
+                        val listResult = MoviesApi.retrofitService.getProperties()
 
-                    val allGenres: MutableSet<String> = mutableSetOf()
+                        val allGenres: MutableSet<String> = mutableSetOf()
 
-                    listResult.films.map { movie -> movie.genres.forEach { allGenres.add(it) } }
+                        listResult.films.map { movie -> movie.genres.forEach { allGenres.add(it) } }
 
-                    genres = allGenres.distinct()
+                        genres = allGenres.distinct()
 
-                    val movies = listResult.films
-                    sortMovies = movies.sortedBy { it.localizedName }
+                        val movies = listResult.films
+                        sortMovies = movies.sortedBy { it.localizedName }
 
-                    presenter?.loadMovies()
-                } catch (e: Exception) {
-                    e.message
-                }
+                        presenter?.loadMovies()
+                        break
+                    } catch (e: Exception) {
+                        e.message
+                    }
             }
     }
 

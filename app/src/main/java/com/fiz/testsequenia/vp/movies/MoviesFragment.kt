@@ -47,6 +47,7 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     override fun updateUI(genres: List<String>, sortMovies: List<MovieProperty>, genreSelected: String?) {
         if (!this::adapter.isInitialized) return
+        val state=binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         adapter.refreshData(
             genres,
             sortMovies,
@@ -57,6 +58,7 @@ class MoviesFragment : Fragment(), IMoviesView {
         binding.moviesRecyclerView.post {
             binding.moviesRecyclerView.layoutManager = manager
             binding.moviesRecyclerView.adapter = adapter
+            (binding.moviesRecyclerView.layoutManager as GridLayoutManager).onRestoreInstanceState(state)
         }
     }
 

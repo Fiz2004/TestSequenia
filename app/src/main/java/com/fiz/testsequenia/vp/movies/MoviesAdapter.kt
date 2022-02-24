@@ -73,13 +73,16 @@ class MoviesAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is HeaderViewHolder -> {
-                holder.bind((data[position] as DataItem.Header).title)
+                val header = data[position] as DataItem.Header
+                holder.bind(header.title)
             }
             is GenreViewHolder -> {
-                holder.bind((data[position] as DataItem.GenreItem).genre, genreSelected, onClickGenre)
+                val genreItem = data[position] as DataItem.GenreItem
+                holder.bind(genreItem.genre, genreSelected, onClickGenre)
             }
             is MovieViewHolder -> {
-                holder.bind((data[position] as DataItem.MoviePropertyItem).movieProperty, onClickMovie)
+                val moviePropertyItem = data[position] as DataItem.MoviePropertyItem
+                holder.bind(moviePropertyItem.movieProperty, onClickMovie)
             }
         }
     }
