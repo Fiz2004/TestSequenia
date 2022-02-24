@@ -3,7 +3,7 @@
     package="com.fiz.testsequenia">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
-        android:name=".app.app"
+        android:name=".app.App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

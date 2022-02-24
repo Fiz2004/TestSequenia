@@ -1,92 +1,149 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
-import android.view.*
+import android.os.Parcelable
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.fiz.testsequenia.R
+import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
-import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.domain.models.Genre
+import com.fiz.testsequenia.domain.models.Movie
 
-class MoviesFragment : Fragment(), IMoviesView {
-    private var _binding: FragmentMoviesBinding? = null
-    private val binding get() = _binding!!
+class MoviesFragment : Fragment(), MoviesContract.View {
 
-    private var moviesPresenter: MoviesPresenter? = null
+    private var state: Parcelable? = null
 
-    private lateinit var adapter: MoviesAdapter
-    private lateinit var manager: GridLayoutManager
+    private val moviesRepository by lazy {
+        (requireActivity().application as App).appContainer.moviesRepository
+    }
+
+    private val moviesPresenter: MoviesContract.Presenter by lazy {
+        MoviesPresenter(this, moviesRepository)
+    }
+
+    private val adapter: MoviesAdapter by lazy {
+        MoviesAdapter(
+            requireContext(),
+            { id -> clickMovie(id) },
+            { genre -> clickGenre(genre) }
+        )
+    }
+
+    private lateinit var binding: FragmentMoviesBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        state = savedInstanceState?.getParcelable(RECYCLER_VIEW_STATE)
+
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
-        moviesPresenter = MoviesPresenter(this, genreSelected)
+        if (genreSelected != null)
+            moviesPresenter.genreSelected = (Genre(name = genreSelected))
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMoviesBinding.inflate(inflater, container, false)
-
-        moviesPresenter?.onCreateView()
-
+        binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
+    override fun onDetach() {
+        super.onDetach()
+        moviesPresenter.cleanUp()
     }
 
-    override fun onStart() {
-        super.onStart()
-        moviesPresenter?.onStart()
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun updateUI(genres: List<String>, sortMovies: List<MovieProperty>, genreSelected: String?) {
-        if (!this::adapter.isInitialized) return
-        adapter.refreshData(
-            genres,
-            sortMovies,
-            genreSelected
-        )
-        manager.spanSizeLookup = moviesPresenter?.spanSizeLookup(genres)
+        if (state != null)
+            binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
 
-        binding.moviesRecyclerView.post {
-            binding.moviesRecyclerView.layoutManager = manager
-            binding.moviesRecyclerView.adapter = adapter
+        binding.moviesRecyclerView.layoutManager = GridLayoutManager(activity, 2)
+
+        moviesPresenter.loadMovies()
+
+        binding.repeat.setOnClickListener {
+            moviesPresenter.loadMovies()
         }
+    }
+
+    override fun updateUI(
+        movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?
+    ) {
+        val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+
+        adapter.refreshData(movies, genres, genreSelected)
+
+        val manager = binding.moviesRecyclerView.layoutManager
+        (manager as? GridLayoutManager)?.spanSizeLookup =
+            spanSizeLookup(genres.size)
+
+        binding.moviesRecyclerView.visibility = View.VISIBLE
+        binding.moviesRecyclerView.layoutManager = manager
+        binding.moviesRecyclerView.adapter = adapter
+
+        binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
+    }
+
+    override fun setLoadingIndicator(active: Boolean) {
+        val visibility = if (active)
+            View.VISIBLE
+        else
+            View.GONE
+
+        binding.circularProgressIndicator.visibility = visibility
+        binding.repeat.visibility = View.GONE
+    }
+
+    override fun showError(message: String) {
+        binding.circularProgressIndicator.visibility = View.GONE
+        binding.repeat.visibility = View.VISIBLE
+        binding.moviesRecyclerView.visibility = View.GONE
+        if (context != null)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun spanSizeLookup(countGenres: Int) =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) = when (position) {
+                0, countGenres + 1 -> 2
+                in 1..countGenres -> 2
+                else -> 1
+            }
+        }
+
+    override fun clickMovie(id: Int) {
+        moviesPresenter.clickMovie(id)
+    }
+
+    override fun clickGenre(genre: Genre) {
+        moviesPresenter.clickGenre(genre)
+    }
+
+    override fun moveMovieDetails(id: Int) {
+        val action = MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
+        findNavController().navigate(action)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        moviesPresenter?.onSaveInstanceState(outState)
+        if (this::binding.isInitialized)
+            state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+        outState.putParcelable(RECYCLER_VIEW_STATE, state)
+
+        moviesPresenter.genreSelected?.let {
+            outState.putString(MoviesPresenter.KEY_GENRE_SELECTED, it.name)
+        }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        moviesPresenter?.onDestroyView()
-        _binding = null
+    companion object {
+        const val RECYCLER_VIEW_STATE = "RECYCLER_VIEW_STATE"
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        moviesPresenter = null
-    }
-
-    override fun initUI() {
-        binding.topAppBar.title = "Главная"
-
-        if (moviesPresenter == null) return
-        adapter = MoviesAdapter(
-            requireContext().applicationContext,
-            moviesPresenter!!::clickMovie,
-            moviesPresenter!!::clickGenre
-        )
-
-        manager = GridLayoutManager(activity, 2)
-    }
-
 }

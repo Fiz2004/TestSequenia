@@ -1,91 +1,73 @@
 package com.fiz.testsequenia.vp.movieDetails
 
 import android.os.Bundle
-import android.view.*
-import androidx.core.net.toUri
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
+import androidx.navigation.fragment.findNavController
 import com.fiz.testsequenia.R
+import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
+import com.fiz.testsequenia.utils.loadUrl
 
-class MovieDetailsFragment : Fragment(), IMovieDetailsView {
-    private var _binding: FragmentMovieDetailsBinding? = null
-    private val binding get() = _binding!!
+class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
 
-    private var movieDetailsPresenter: MovieDetailsPresenter? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        movieDetailsPresenter = MovieDetailsPresenter(this)
-//        setHasOptionsMenu(true)
+    private val moviesRepository by lazy {
+        (requireActivity().application as App).appContainer.moviesRepository
     }
+
+    private val movieDetailsPresenter: MovieDetailsPresenter by lazy {
+        MovieDetailsPresenter(this, moviesRepository)
+    }
+
+    private lateinit var binding: FragmentMovieDetailsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
+        binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
-        movieDetailsPresenter?.setId(args.id)
-        movieDetailsPresenter?.onCreateView()
-
-        binding.topAppBar.setNavigationOnClickListener {
-            movieDetailsPresenter?.clickBack()
-        }
+        movieDetailsPresenter.start(args.id)
 
         return binding.root
     }
 
-    override fun onSetImage(url: String?) {
-        val imgUri = url?.toUri()?.buildUpon()?.scheme("https")?.build()
-        url?.let {
-            Glide.with(binding.imageUrl.context)
-                .load(imgUri)
-                .placeholder(R.drawable.ic_baseline_cloud_download_24)
-                .error(R.drawable.ic_baseline_broken_image_24)
-                .into(binding.imageUrl)
-        }
-        if (url == null) {
-            Glide.with(binding.imageUrl.context)
-                .load(R.drawable.ic_baseline_broken_image_24)
-                .into(binding.imageUrl)
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        movieDetailsPresenter.load()
     }
 
-    override fun onSetDescription(description: String) {
+    override fun updateUI(
+        name: String,
+        year: Int,
+        rating: Double?,
+        description: String,
+        localizedName: String,
+        url: String?
+    ) {
+
+        binding.imageUrl.loadUrl(url)
+
         binding.descriptionTextView.text = description
-    }
 
-    override fun onSetRating(rating: Double?) {
         binding.ratingTextView.text = if (rating != null)
             resources.getString(R.string.rating, rating)
         else
             ""
-    }
 
-    override fun onSetYear(year: Int) {
         binding.yearTextView.text = resources.getString(R.string.year, year)
-    }
 
-    override fun onSetName(name: String) {
         binding.nameTextView.text = name
+
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.appBarLayout)
+        toolbar.title = localizedName
     }
 
-    override fun onSetLocalizedName(localizedName: String) {
-        binding.topAppBar.title = localizedName
+    override fun onClickBack() {
+        findNavController().popBackStack()
     }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-
-        movieDetailsPresenter = null
-    }
-
 }

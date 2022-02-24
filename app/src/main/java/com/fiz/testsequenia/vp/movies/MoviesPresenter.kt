@@ -1,82 +1,68 @@
 package com.fiz.testsequenia.vp.movies
 
-import android.os.Bundle
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import com.fiz.testsequenia.model.MoviesRepository
-import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.data.data_sources.remote.dto.toGenre
+import com.fiz.testsequenia.domain.models.Genre
+import com.fiz.testsequenia.domain.models.Movie
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
+import com.fiz.testsequenia.utils.Resource
+import kotlinx.coroutines.*
 
-class MoviesPresenter(private val view: IMoviesView, private var genreSelected: String? = null) : IMoviesPresenter {
+class MoviesPresenter(
+    private val view: MoviesContract.View,
+    private val moviesRepository: MoviesRepository
+) : MoviesContract.Presenter {
+    private var genres: List<Genre> = listOf()
+    private var movies: List<Movie> = listOf()
 
-    private val moviesRepository: MoviesRepository = MoviesRepository.get()
-    private var genres: List<String>? = null
-    private var sortMovies: List<MovieProperty>? = null
-
-    private lateinit var filterMovies: List<MovieProperty>
-
-    fun onCreateView() {
-        moviesRepository.addPresenter(this)
-        genres = moviesRepository.getGenres()
-        sortMovies = moviesRepository.getSortMovies()
-        if (genres != null && sortMovies != null)
-            loadMovies()
-        view.initUI()
-    }
-
-    override fun loadMovies() {
-        if (genreSelected != null) {
-            genres = moviesRepository.getGenres()
-            sortMovies = moviesRepository.getSortMovies()
-            filterMovies = sortMovies!!.filter { it.genres.contains(genreSelected) }
-        } else {
-            genres = moviesRepository.getGenres()
-            sortMovies = moviesRepository.getSortMovies()
-            view.updateUI(genres!!, sortMovies!!)
-        }
-    }
-
-    fun clickGenre(genre: String = "") {
-        if (genreSelected == genre) {
-            genreSelected = null
-            filterMovies = sortMovies!!
-            view.updateUI(genres!!, filterMovies)
-        } else {
-            genreSelected = genre
-            filterMovies = sortMovies?.filter { it.genres.contains(genreSelected) }!!
-            view.updateUI(genres!!, filterMovies, genreSelected)
-        }
-    }
-
-    fun spanSizeLookup(genres: List<String>) =
-        object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int) = when (position) {
-                0, genres.size + 1 -> 2
-                in 1..genres.size -> 2
-                else -> 1
+    override var genreSelected: Genre? = null
+        set(value) {
+            field = if (value == genreSelected) {
+                null
+            } else {
+                value
             }
         }
 
-    fun clickMovie(id: Int) {
-        (view as MoviesFragment).findNavController()
-            .navigate(
-                MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
-            )
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+
+    override fun loadMovies() {
+        scope.launch {
+            view.setLoadingIndicator(active = true)
+            val resultLoad = try {
+                moviesRepository.loadData()
+            } catch (e: Exception) {
+                Resource.Error("Network request failed")
+            }
+            when (resultLoad) {
+                is Resource.Success -> {
+                    val movies = resultLoad.data ?: listOf()
+                    this@MoviesPresenter.movies = movies.sortedBy { it.localizedName }
+                    this@MoviesPresenter.genres =
+                        movies.flatMap { movie -> movie.genres.map { it } }
+                            .distinct().map { it.toGenre() }
+                    view.setLoadingIndicator(active = false)
+                    view.updateUI(this@MoviesPresenter.movies, genres, genreSelected)
+                }
+                else -> {
+                    view.showError(resultLoad.message!!)
+                }
+            }
+        }
     }
 
-    fun onSaveInstanceState(outState: Bundle) {
-        genreSelected?.let { outState.putString(KEY_GENRE_SELECTED, it) }
+    override fun cleanUp() {
+        scope.cancel()
     }
 
-    fun onStart() {
-        if (genres != null && sortMovies != null)
-            if (this::filterMovies.isInitialized)
-                view.updateUI(genres!!, filterMovies, genreSelected)
-            else
-                view.updateUI(genres!!, sortMovies!!, genreSelected)
+    override fun clickMovie(id: Int) {
+        view.moveMovieDetails(id)
     }
 
-    fun onDestroyView() {
-        moviesRepository.removePresenter()
+    override fun clickGenre(genre: Genre?) {
+        genre?.let {
+            genreSelected = it
+        }
+        view.updateUI(movies, genres, genreSelected)
     }
 
     companion object {

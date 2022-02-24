@@ -1,30 +1,29 @@
 package com.fiz.testsequenia.vp.movieDetails
 
-import androidx.navigation.fragment.findNavController
-import com.fiz.testsequenia.model.MoviesRepository
+import com.fiz.testsequenia.domain.models.Movie
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
 
-class MovieDetailsPresenter(private val view: IMovieDetailsView) {
-    private var id: Int = 0
-    private val moviesRepository: MoviesRepository = MoviesRepository.get()
+class MovieDetailsPresenter(
+    private val view: MovieDetailsContract.View,
+    private val moviesRepository: MoviesRepository
+) : MovieDetailsContract.Presenter {
+    private var movie: Movie? = null
 
-    fun onCreateView() {
-        val movie = moviesRepository.getSortMovies()?.first { id == it.id }
-
-        movie?.name?.let { view.onSetName(it) }
-        movie?.year?.let { view.onSetYear(it) }
-        movie?.rating?.let { view.onSetRating(it) } ?: view.onSetRating(null)
-        movie?.description?.let { view.onSetDescription(it) }
-        movie?.localizedName?.let { view.onSetLocalizedName(it) }
-
-        view.onSetImage(movie?.imageUrl)
+    override fun start(id: Int) {
+        movie = moviesRepository.movies?.first { id == it.id }
     }
 
-    fun clickBack() {
-        (view as MovieDetailsFragment).findNavController()
-            .popBackStack()
-    }
 
-    fun setId(id: Int) {
-        this.id = id
+    override fun load() {
+        movie?.let {
+            view.updateUI(
+                name = it.name,
+                year = it.year,
+                rating = it.rating,
+                description = it.description,
+                localizedName = it.localizedName,
+                url = it.imageUrl
+            )
+        }
     }
 }
