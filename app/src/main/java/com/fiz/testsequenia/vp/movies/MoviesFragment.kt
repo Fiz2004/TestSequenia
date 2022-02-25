@@ -10,7 +10,7 @@ import com.fiz.testsequenia.model.network.models.MovieProperty
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
-    private val binding get() = _binding!!
+    val binding get() = _binding!!
 
     private var moviesPresenter: MoviesPresenter? = null
 
@@ -79,7 +79,7 @@ class MoviesFragment : Fragment(), IMoviesView {
     }
 
     override fun initUI() {
-        binding.topAppBar.title = "Главная"
+        binding.topAppBar.title = resources.getString(R.string.main)
 
         if (moviesPresenter == null) return
         adapter = MoviesAdapter(

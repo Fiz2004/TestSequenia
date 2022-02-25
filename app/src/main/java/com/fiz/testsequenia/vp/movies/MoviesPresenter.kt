@@ -3,10 +3,11 @@ package com.fiz.testsequenia.vp.movies
 import android.os.Bundle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.fiz.testsequenia.R
 import com.fiz.testsequenia.model.MoviesRepository
 import com.fiz.testsequenia.model.network.models.MovieProperty
 
-class MoviesPresenter(private val view: IMoviesView, private var genreSelected: String? = null) : IMoviesPresenter {
+class MoviesPresenter(val view: IMoviesView, private var genreSelected: String? = null) : IMoviesPresenter {
 
     private val moviesRepository: MoviesRepository = MoviesRepository.get()
     private var genres: List<String>? = null
@@ -68,11 +69,13 @@ class MoviesPresenter(private val view: IMoviesView, private var genreSelected: 
     }
 
     fun onStart() {
+        (view as MoviesFragment).binding.topAppBar.title = view.context?.resources?.getString(R.string.main)
         if (genres != null && sortMovies != null)
-            if (this::filterMovies.isInitialized)
+            if (this::filterMovies.isInitialized) {
                 view.updateUI(genres!!, filterMovies, genreSelected)
-            else
+            } else {
                 view.updateUI(genres!!, sortMovies!!, genreSelected)
+            }
     }
 
     fun onDestroyView() {
