@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.*
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
+import com.fiz.testsequenia.model.MoviesRepository
 
 class MovieDetailsFragment : Fragment(), IMovieDetailsView {
     private var _binding: FragmentMovieDetailsBinding? = null
@@ -16,8 +18,7 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        movieDetailsPresenter = MovieDetailsPresenter(this)
-//        setHasOptionsMenu(true)
+        movieDetailsPresenter = MovieDetailsPresenter(this, MoviesRepository.get())
     }
 
     override fun onCreateView(
@@ -27,14 +28,19 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
         _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
-        movieDetailsPresenter?.setId(args.id)
-        movieDetailsPresenter?.onCreateView()
+        movieDetailsPresenter?.onCreateView(args.id)
+
 
         binding.topAppBar.setNavigationOnClickListener {
             movieDetailsPresenter?.clickBack()
         }
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        movieDetailsPresenter?.onViewCreated()
     }
 
     override fun onSetImage(url: String?) {
@@ -53,8 +59,12 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
         }
     }
 
-    override fun onSetDescription(description: String) {
-        binding.descriptionTextView.text = description
+    override fun onClickBack() {
+        findNavController().popBackStack()
+    }
+
+    override fun onSetDescription(description: String?) {
+        binding.descriptionTextView.text = description ?: ""
     }
 
     override fun onSetRating(rating: Double?) {

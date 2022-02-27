@@ -3,7 +3,6 @@ package com.fiz.testsequenia.vp.movies
 import android.os.Bundle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.fiz.testsequenia.R
 import com.fiz.testsequenia.model.MoviesRepository
 import com.fiz.testsequenia.model.network.models.MovieProperty
 
@@ -69,7 +68,6 @@ class MoviesPresenter(val view: IMoviesView, private var genreSelected: String? 
     }
 
     fun onStart() {
-        (view as MoviesFragment).binding.topAppBar.title = view.context?.resources?.getString(R.string.main)
         if (genres != null && sortMovies != null)
             if (this::filterMovies.isInitialized) {
                 view.updateUI(genres!!, filterMovies, genreSelected)
