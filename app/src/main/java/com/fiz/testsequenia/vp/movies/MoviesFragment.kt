@@ -3,10 +3,9 @@ package com.fiz.testsequenia.vp.movies
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
-import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.model.MoviesRepository
 
 class MoviesFragment : Fragment(), IMoviesView {
     private var _binding: FragmentMoviesBinding? = null
@@ -14,14 +13,11 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     private var moviesPresenter: MoviesPresenter? = null
 
-    private lateinit var adapter: MoviesAdapter
-    private lateinit var manager: GridLayoutManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
-        moviesPresenter = MoviesPresenter(this, genreSelected)
+        moviesPresenter = MoviesPresenter(this, genreSelected, MoviesRepository.get())
     }
 
     override fun onCreateView(
@@ -45,23 +41,6 @@ class MoviesFragment : Fragment(), IMoviesView {
         moviesPresenter?.onStart()
     }
 
-    override fun updateUI(genres: List<String>, sortMovies: List<MovieProperty>, genreSelected: String?) {
-        if (!this::adapter.isInitialized) return
-        val state=binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
-        adapter.refreshData(
-            genres,
-            sortMovies,
-            genreSelected
-        )
-        manager.spanSizeLookup = moviesPresenter?.spanSizeLookup(genres)
-
-        binding.moviesRecyclerView.post {
-            binding.moviesRecyclerView.layoutManager = manager
-            binding.moviesRecyclerView.adapter = adapter
-            (binding.moviesRecyclerView.layoutManager as GridLayoutManager).onRestoreInstanceState(state)
-        }
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         moviesPresenter?.onSaveInstanceState(outState)
@@ -78,17 +57,8 @@ class MoviesFragment : Fragment(), IMoviesView {
         moviesPresenter = null
     }
 
-    override fun initUI() {
-        binding.topAppBar.title = resources.getString(R.string.main)
-
-        if (moviesPresenter == null) return
-        adapter = MoviesAdapter(
-            requireContext().applicationContext,
-            moviesPresenter!!::clickMovie,
-            moviesPresenter!!::clickGenre
-        )
-
-        manager = GridLayoutManager(activity, 2)
+    override fun onSetTopAppBarTitle(textID: Int) {
+        binding.topAppBar.title = resources.getString(textID)
     }
 
 }
