@@ -11,6 +11,7 @@ import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
+import com.fiz.testsequenia.model.DataMovies
 import com.fiz.testsequenia.model.network.models.MovieProperty
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
@@ -22,45 +23,65 @@ class MoviesAdapter(
     private val onClickMovie: (Int) -> Unit,
     private val onClickGenre: (String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private var genre: List<String> = listOf()
-    private var movies: List<MovieProperty> = listOf()
-    private var genreSelected: String? = null
+    private lateinit var dataMovies: DataMovies
 
     var data: List<DataItem> = listOf()
 
-    fun refreshData(genre: List<String>, movies: List<MovieProperty>, genreSelected: String?) {
-        this.genre = genre
-        this.movies = movies
-        this.genreSelected = genreSelected
-        val newData =
+    fun refreshData(dataMovies: DataMovies) {
+        this.dataMovies = dataMovies
+
+        val newData: List<DataItem> =
             listOf(DataItem.Header(context.resources.getString(R.string.genres))) +
-                    genre.map { DataItem.GenreItem(it) } +
-                    listOf(DataItem.Header(context.resources.getString(R.string.movies))) +
-                    movies.map {
-                        DataItem.MoviePropertyItem(it)
-                    }
+                    dataMovies.genres?.map { DataItem.GenreItem(it) }!! +
+                    listOf(
+                        DataItem.Header(
+                            context.resources.getString(R.string.movies)
+                        )
+                    ) + dataMovies.getMovies()?.map {
+                DataItem.MoviePropertyItem(it)
+            }!!
 
         val diffCallback = DataDiffCallback(data, newData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
+
         data = newData
+
         diffResult.dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            ITEM_VIEW_TYPE_HEADER -> HeaderViewHolder(ListItemHeaderBinding.inflate(inflater, parent, false))
-            ITEM_VIEW_TYPE_GENRE -> GenreViewHolder(ListItemGenreBinding.inflate(inflater, parent, false))
-            ITEM_VIEW_TYPE_MOVIE -> MovieViewHolder(ListItemMovieBinding.inflate(inflater, parent, false))
+            ITEM_VIEW_TYPE_HEADER -> HeaderViewHolder(
+                ListItemHeaderBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+            )
+            ITEM_VIEW_TYPE_GENRE -> GenreViewHolder(
+                ListItemGenreBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+            )
+            ITEM_VIEW_TYPE_MOVIE -> MovieViewHolder(
+                ListItemMovieBinding.inflate(
+                    inflater,
+                    parent,
+                    false
+                )
+            )
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (genre.isNotEmpty())
+        if (dataMovies.genres?.isNotEmpty() == true)
             return when (position) {
-                0, genre.size + 1 -> ITEM_VIEW_TYPE_HEADER
-                in 1..genre.size -> ITEM_VIEW_TYPE_GENRE
+                0, dataMovies.genres!!.size + 1 -> ITEM_VIEW_TYPE_HEADER
+                in 1..dataMovies.genres!!.size -> ITEM_VIEW_TYPE_GENRE
                 else -> ITEM_VIEW_TYPE_MOVIE
             }
         return when (position) {
@@ -78,7 +99,7 @@ class MoviesAdapter(
             }
             is GenreViewHolder -> {
                 val genreItem = data[position] as DataItem.GenreItem
-                holder.bind(genreItem.genre, genreSelected, onClickGenre)
+                holder.bind(genreItem.genre, dataMovies.genreSelected, onClickGenre)
             }
             is MovieViewHolder -> {
                 val moviePropertyItem = data[position] as DataItem.MoviePropertyItem
@@ -91,7 +112,8 @@ class MoviesAdapter(
         return data.size
     }
 
-    class HeaderViewHolder(private val binding: ListItemHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
+    class HeaderViewHolder(private val binding: ListItemHeaderBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
 
         fun bind(item: String) {
@@ -100,7 +122,8 @@ class MoviesAdapter(
         }
     }
 
-    class GenreViewHolder(private val binding: ListItemGenreBinding) : RecyclerView.ViewHolder(binding.root) {
+    class GenreViewHolder(private val binding: ListItemGenreBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         var item: String? = null
 
         fun bind(item: String, genreSelected: String?, onClickGenre: (String) -> Unit) {
@@ -115,7 +138,8 @@ class MoviesAdapter(
 
     }
 
-    class MovieViewHolder(private val binding: ListItemMovieBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MovieViewHolder(private val binding: ListItemMovieBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         var item: MovieProperty? = null
 
         fun bind(item: MovieProperty, callback: (Int) -> Unit) {
