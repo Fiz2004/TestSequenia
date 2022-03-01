@@ -41,6 +41,8 @@ class MoviesFragment : Fragment(), IMoviesView {
     ) {
         if (!this::adapter.isInitialized) return
 
+        hideProgressIndicator()
+
         saveInstanceState()
         adapter.refreshData(dataMovies)
         manager.spanSizeLookup = getSpanSizeLookup(dataMovies.genres!!)
@@ -48,6 +50,12 @@ class MoviesFragment : Fragment(), IMoviesView {
         setManagerAdapter(manager)
         setAdapter(adapter)
         restoreInstanceState()
+    }
+
+    private fun hideProgressIndicator() {
+        binding.circularProgressIndicator.post {
+            binding.circularProgressIndicator.visibility = View.GONE
+        }
     }
 
     override fun onAttach(context: Context) {
