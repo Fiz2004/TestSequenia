@@ -23,9 +23,8 @@
         android:gravity="center"
         android:ellipsize="end"
         android:textSize="18sp"
-        android:background="@color/md_theme_light_background"
+        android:background="?android:colorBackground"
         android:alpha="0.5"
-        android:textColor="#FFFFFF"
         android:maxLines="2"
-        android:text="TextView" />
+        android:textColor="?attr/colorOnSurface" />
 </com.google.android.material.card.MaterialCardView>

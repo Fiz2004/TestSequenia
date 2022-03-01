@@ -26,11 +26,11 @@
 
     //Задний фон
     <color name="md_theme_light_background">#121212</color>
-    <color name="md_theme_light_onBackground">#0000FF</color>
+    <color name="md_theme_light_onBackground">#FFFFFF</color>
 
     //Верхняя панель и кнопки
     <color name="md_theme_light_surface">#323232</color>
-    <color name="md_theme_light_onSurface">#0000FF</color>
+    <color name="md_theme_light_onSurface">#FFFFFF</color>
 
     <color name="md_theme_light_surfaceVariant">#0000FF</color>
 

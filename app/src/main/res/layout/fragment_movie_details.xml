@@ -24,7 +24,7 @@
                 android:layout_height="?attr/actionBarSize"
                 app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
                 app:title="page"
-                app:titleTextColor="#FFFFFF" />
+                app:titleTextColor="?attr/colorOnPrimary" />
         </com.google.android.material.appbar.AppBarLayout>
 
         <ImageView
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:textAlignment="viewStart"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
@@ -50,7 +50,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/yearTextView"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -62,7 +62,7 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/ratingTextView"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
@@ -78,7 +78,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:padding="16dp"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnPrimary"
             android:singleLine="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_width="0dp"
         android:checkable="true"
-        android:text="иапораи"
         android:textAlignment="center"
         app:chipCornerRadius="4dp"
         app:chipMinHeight="40dp"
