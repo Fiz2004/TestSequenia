@@ -29,6 +29,9 @@ class MoviesPresenterTest {
     lateinit var view: IMoviesView
 
     @Mock
+    lateinit var context: Context
+
+    @Mock
     lateinit var moviesRepository: MoviesRepository
 
     @Test

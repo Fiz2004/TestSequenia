@@ -53,9 +53,8 @@ class MoviesFragment : Fragment(), IMoviesView {
     }
 
     private fun hideProgressIndicator() {
-        binding.circularProgressIndicator.post {
-            binding.circularProgressIndicator.visibility = View.GONE
-        }
+        binding.circularProgressIndicator.visibility = View.GONE
+
     }
 
     override fun onAttach(context: Context) {
@@ -65,9 +64,8 @@ class MoviesFragment : Fragment(), IMoviesView {
     }
 
     override fun restoreInstanceState() {
-        binding.moviesRecyclerView.post {
-            binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
-        }
+        binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
+
     }
 
     override fun saveInstanceState() {
@@ -75,15 +73,12 @@ class MoviesFragment : Fragment(), IMoviesView {
     }
 
     override fun setAdapter(adapter: MoviesAdapter) {
-        binding.moviesRecyclerView.post {
-            binding.moviesRecyclerView.adapter = adapter
-        }
+        binding.moviesRecyclerView.adapter = adapter
+
     }
 
     override fun setManagerAdapter(manager: GridLayoutManager) {
-        binding.moviesRecyclerView.post {
-            binding.moviesRecyclerView.layoutManager = manager
-        }
+        binding.moviesRecyclerView.layoutManager = manager
     }
 
     override fun clickMovie(id: Int) {

@@ -10,6 +10,7 @@ import com.fiz.testsequenia.vp.movies.IMoviesPresenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MoviesRepository(private val context: Context) {
     private var presenter: IMoviesPresenter? = null
@@ -17,35 +18,29 @@ class MoviesRepository(private val context: Context) {
     private var genres: List<String>? = null
     private var sortMovies: List<MovieProperty>? = null
 
-    fun loadDataMovies() {
-        if (genres == null || sortMovies == null)
+    suspend fun loadDataMovies() {
+        var message: String
+        for (n in 0..10) {
+            try {
+                val listResult = MoviesApi.retrofitService.getProperties()
 
-            CoroutineScope(Dispatchers.IO).launch {
-                var message:String=""
-                for (n in 0..10) {
-                    try {
-                        val listResult = MoviesApi.retrofitService.getProperties()
+                genres = listResult.films.flatMap { movie -> movie.genres }.distinct()
 
-                        val allGenres: MutableSet<String> = mutableSetOf()
+                val movies = listResult.films
+                sortMovies = movies.sortedBy { it.localizedName }
 
-                        listResult.films.map { movie -> movie.genres.forEach { allGenres.add(it) } }
-
-                        genres = allGenres.distinct()
-
-                        val movies = listResult.films
-                        sortMovies = movies.sortedBy { it.localizedName }
-
-                        presenter?.onLoadMovies()
-                        break
-                    } catch (e: Exception) {
-                        message= e.message.toString()
-                    }
-                    if (message!="")
-                        Handler(Looper.getMainLooper()).post {
-                            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                        }
+                withContext(Dispatchers.Main) {
+                    presenter?.onLoadMovies()
                 }
+                break
+            } catch (e: Exception) {
+                message = e.message.toString()
             }
+            if (message != "")
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                }
+        }
     }
 
     fun getGenres(): List<String>? {
@@ -77,12 +72,15 @@ class MoviesRepository(private val context: Context) {
         fun initialize(context: Context) {
             if (INSTANCE == null) {
                 INSTANCE = MoviesRepository(context)
-                INSTANCE?.loadDataMovies()
+                CoroutineScope(Dispatchers.IO).launch {
+                    INSTANCE?.loadDataMovies()
+                }
             }
         }
 
         fun get(): MoviesRepository {
-            return INSTANCE ?: throw IllegalStateException("CrimeRepository must be initialized")
+            return INSTANCE
+                ?: throw IllegalStateException("CrimeRepository must be initialized")
         }
     }
 }
