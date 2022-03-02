@@ -37,8 +37,7 @@ class MoviesFragment : Fragment(), IMoviesView {
     }
 
     override fun updateUI(
-        dataMovies: DataMovies,
-        getSpanSizeLookup: (List<String>) -> GridLayoutManager.SpanSizeLookup,
+        dataMovies: DataMovies
     ) {
         if (!this::adapter.isInitialized) return
 
@@ -46,12 +45,21 @@ class MoviesFragment : Fragment(), IMoviesView {
 
         saveInstanceState()
         adapter.refreshData(dataMovies)
-        manager.spanSizeLookup = getSpanSizeLookup(dataMovies.genres!!)
+        manager.spanSizeLookup = spanSizeLookup(dataMovies.genres!!)
 
         setManagerAdapter(manager)
         setAdapter(adapter)
         restoreInstanceState()
     }
+
+    private fun spanSizeLookup(genres: List<String>) =
+        object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int) = when (position) {
+                0, genres.size + 1 -> 2
+                in 1..genres.size -> 2
+                else -> 1
+            }
+        }
 
     private fun hideProgressIndicator() {
         binding.circularProgressIndicator.visibility = View.GONE
@@ -112,7 +120,6 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        moviesPresenter?.onDestroyView()
         _binding = null
     }
 

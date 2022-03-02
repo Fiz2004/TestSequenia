@@ -6,20 +6,20 @@ import android.os.Looper
 import android.widget.Toast
 import com.fiz.testsequenia.model.network.MoviesApi
 import com.fiz.testsequenia.model.network.models.MovieProperty
-import com.fiz.testsequenia.vp.movies.IMoviesPresenter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MoviesRepository(private val context: Context) {
-    private var presenter: IMoviesPresenter? = null
+    private lateinit var callBack: () -> Unit
 
     private var genres: List<String>? = null
     private var sortMovies: List<MovieProperty>? = null
 
     suspend fun loadDataMovies() {
         var message: String
+        //Пробуем загрузить 10 раз если по какой то причине не получается пишем сообщаем об ошибке
         for (n in 0..10) {
             try {
                 val listResult = MoviesApi.retrofitService.getProperties()
@@ -30,7 +30,8 @@ class MoviesRepository(private val context: Context) {
                 sortMovies = movies.sortedBy { it.localizedName }
 
                 withContext(Dispatchers.Main) {
-                    presenter?.onLoadMovies()
+                    if (this@MoviesRepository::callBack.isInitialized)
+                        callBack()
                 }
                 break
             } catch (e: Exception) {
@@ -44,27 +45,15 @@ class MoviesRepository(private val context: Context) {
     }
 
     fun getGenres(): List<String>? {
-        return if (genres == null) {
-            null
-        } else {
-            genres
-        }
+        return genres
     }
 
     fun getSortMovies(): List<MovieProperty>? {
-        return if (sortMovies == null) {
-            null
-        } else {
-            sortMovies
-        }
+        return sortMovies
     }
 
-    fun addPresenter(moviesPresenter: IMoviesPresenter) {
-        presenter = moviesPresenter
-    }
-
-    fun removePresenter() {
-        presenter = null
+    fun addCallBack(func: () -> Unit) {
+        callBack = func
     }
 
     companion object {
@@ -72,7 +61,7 @@ class MoviesRepository(private val context: Context) {
         fun initialize(context: Context) {
             if (INSTANCE == null) {
                 INSTANCE = MoviesRepository(context)
-                CoroutineScope(Dispatchers.IO).launch {
+                CoroutineScope(Dispatchers.Default).launch {
                     INSTANCE?.loadDataMovies()
                 }
             }

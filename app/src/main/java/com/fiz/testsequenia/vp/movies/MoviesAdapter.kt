@@ -78,15 +78,9 @@ class MoviesAdapter(
     }
 
     override fun getItemViewType(position: Int): Int {
-        if (dataMovies.genres?.isNotEmpty() == true)
-            return when (position) {
-                0, dataMovies.genres!!.size + 1 -> ITEM_VIEW_TYPE_HEADER
-                in 1..dataMovies.genres!!.size -> ITEM_VIEW_TYPE_GENRE
-                else -> ITEM_VIEW_TYPE_MOVIE
-            }
-        return when (position) {
-            0 -> ITEM_VIEW_TYPE_HEADER
-            1 -> ITEM_VIEW_TYPE_GENRE
+        return when (data[position]) {
+            is DataItem.Header -> ITEM_VIEW_TYPE_HEADER
+            is DataItem.GenreItem -> ITEM_VIEW_TYPE_GENRE
             else -> ITEM_VIEW_TYPE_MOVIE
         }
     }

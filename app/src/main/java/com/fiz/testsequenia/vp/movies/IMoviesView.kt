@@ -12,7 +12,6 @@ interface IMoviesView {
     fun saveInstanceState()
     fun initUI()
     fun updateUI(
-        dataMovies: DataMovies,
-        getSpanSizeLookup: (List<String>) -> GridLayoutManager.SpanSizeLookup
+        dataMovies: DataMovies
     )
 }
