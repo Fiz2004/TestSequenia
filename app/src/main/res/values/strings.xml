@@ -6,5 +6,6 @@
     <string name="movies">Фильмы</string>
     <string name="image_movie">Изображение фильма</string>
     <string name="main">Главная</string>
+    <string name="repeatButton">Повторить запрос</string>
 
 </resources>

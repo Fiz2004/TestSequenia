@@ -1,33 +1,22 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
-import com.fiz.testsequenia.R
 import com.fiz.testsequenia.model.DataMovies
 import com.fiz.testsequenia.model.MoviesRepository
 
 class MoviesPresenter(
     private val view: IMoviesView,
-    private val moviesRepository: MoviesRepository,
     private val dataMovies: DataMovies
-) : IMoviesPresenter {
+) {
 
     fun onViewCreated() {
-        addObserver()
+        MoviesRepository.get().loadDataMovies(::updateUI)
         initUI()
-        if (dataMovies.isLoadData()) {
-            if (dataMovies.isGenreSelected())
-                onLoadMoviesIfGenreSelected()
-            else
-                onLoadMovies()
-        }
-    }
-
-    private fun addObserver() {
-        moviesRepository.addCallBack(::onLoadMovies)
+        if (dataMovies.isGenreSelected())
+            updateUI()
     }
 
     private fun initUI() {
-        view.onSetTopAppBarTitle(R.string.main)
         view.initUI()
     }
 
@@ -44,15 +33,7 @@ class MoviesPresenter(
         updateUI()
     }
 
-    override fun onLoadMovies() {
-        updateUI()
-    }
-
-    override fun onLoadMoviesIfGenreSelected() {
-        updateUI()
-    }
-
-    private fun updateUI() {
+    fun updateUI() {
         view.updateUI(dataMovies)
     }
 

@@ -6,6 +6,6 @@ import com.fiz.testsequenia.model.MoviesRepository
 class app:Application() {
     override fun onCreate() {
         super.onCreate()
-        MoviesRepository.initialize(this)
+        MoviesRepository.initialize()
     }
 }

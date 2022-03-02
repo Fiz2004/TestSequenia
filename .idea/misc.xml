@@ -5,10 +5,11 @@
       <map>
         <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/activity_main.xml" value="0.17119565217391305" />
         <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/fragment_movie_details.xml" value="0.35778985507246375" />
-        <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/fragment_movies.xml" value="0.35778985507246375" />
+        <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/fragment_movies.xml" value="0.25" />
         <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/list_item_genre.xml" value="0.1778115501519757" />
         <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/list_item_header.xml" value="0.1778115501519757" />
         <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/layout/list_item_movie.xml" value="0.1778115501519757" />
+        <entry key="..\:/Programs/AndroidStudioProjects/TestSequenia/app/src/main/res/menu/menu.xml" value="0.2265625" />
         <entry key="..\:/Users/Fiz20/AndroidStudioProjects/TestSequenia/app/src/main/res/drawable/baseline_arrow_back_18.xml" value="0.3245" />
         <entry key="..\:/Users/Fiz20/AndroidStudioProjects/TestSequenia/app/src/main/res/drawable/ic_baseline_broken_image_24.xml" value="0.1505" />
         <entry key="..\:/Users/Fiz20/AndroidStudioProjects/TestSequenia/app/src/main/res/drawable/ic_baseline_cloud_download_24.xml" value="0.1505" />

@@ -12,10 +12,6 @@ class DataMovies(
     private val sortMovies: List<MovieProperty>?
         get() = moviesRepository.getSortMovies()
 
-    fun isLoadData(): Boolean {
-        return genres != null && sortMovies != null
-    }
-
     fun getMovies(): List<MovieProperty>? = if (genreSelected == null)
         sortMovies
     else
