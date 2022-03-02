@@ -1,7 +1,9 @@
 package com.fiz.testsequenia.vp.movieDetails
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -84,11 +86,6 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
 
     override fun onSetLocalizedName(localizedName: String) {
         binding.topAppBar.title = localizedName
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onDestroyView() {
