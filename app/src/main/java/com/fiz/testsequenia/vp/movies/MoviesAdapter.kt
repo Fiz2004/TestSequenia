@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import coil.load
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
@@ -140,16 +140,13 @@ class MoviesAdapter(
             this.item = item
             val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
             item.imageUrl?.let {
-                Glide.with(binding.imgMovie.context)
-                    .load(imgUri)
-                    .placeholder(R.drawable.ic_baseline_cloud_download_24)
-                    .error(R.drawable.ic_baseline_broken_image_24)
-                    .into(binding.imgMovie)
+                binding.imgMovie.load(imgUri) {
+                    placeholder(R.drawable.ic_baseline_cloud_download_24)
+                    error(R.drawable.ic_baseline_broken_image_24)
+                }
             }
             if (item.imageUrl == null) {
-                Glide.with(binding.imgMovie.context)
-                    .load(R.drawable.ic_baseline_broken_image_24)
-                    .into(binding.imgMovie)
+                binding.imgMovie.load(R.drawable.ic_baseline_broken_image_24)
             }
             binding.nameMovie.text = item.localizedName
             binding.root.setOnClickListener { callback(item.id) }

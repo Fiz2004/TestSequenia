@@ -44,6 +44,10 @@ class MoviesFragment : Fragment(), IMoviesView {
         super.onViewCreated(view, savedInstanceState)
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
 
+        val state: Parcelable? = savedInstanceState?.getParcelable("state")
+        if (state != null)
+            this.state = state
+
         if (genreSelected != null)
             moviesPresenter?.setGenreSelected(genreSelected)
         moviesPresenter?.onViewCreated()
@@ -78,13 +82,15 @@ class MoviesFragment : Fragment(), IMoviesView {
             binding.circularProgressIndicator.visibility = View.GONE
             binding.repeat.visibility = View.GONE
 
-            state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+            if (state == null)
+                state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
             adapter.refreshData(dataMovies)
             manager.spanSizeLookup = spanSizeLookup(dataMovies.genres!!)
 
             binding.moviesRecyclerView.layoutManager = manager
             binding.moviesRecyclerView.adapter = adapter
             binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
+            state = null
         } else {
             binding.repeat.visibility = View.VISIBLE
             Toast.makeText(context, MoviesRepository.get().message, Toast.LENGTH_LONG).show()
@@ -101,6 +107,7 @@ class MoviesFragment : Fragment(), IMoviesView {
         }
 
     override fun clickMovie(id: Int) {
+        state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         findNavController().navigate(
             MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
         )
@@ -108,6 +115,8 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
+        state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+        outState.putParcelable("state", state)
         moviesPresenter?.onSaveInstanceState(outState)
     }
 

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.bumptech.glide.Glide
+import coil.load
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
 import com.fiz.testsequenia.model.MoviesRepository
@@ -47,17 +47,18 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
 
     override fun onSetImage(url: String?) {
         val imgUri = url?.toUri()?.buildUpon()?.scheme("https")?.build()
+
         url?.let {
-            Glide.with(binding.imageUrl.context)
-                .load(imgUri)
-                .placeholder(R.drawable.ic_baseline_cloud_download_24)
-                .error(R.drawable.ic_baseline_broken_image_24)
-                .into(binding.imageUrl)
+            binding.imageUrl.load(imgUri) {
+                placeholder(R.drawable.ic_baseline_cloud_download_24)
+                error(R.drawable.ic_baseline_broken_image_24)
+            }
         }
         if (url == null) {
-            Glide.with(binding.imageUrl.context)
-                .load(R.drawable.ic_baseline_broken_image_24)
-                .into(binding.imageUrl)
+            binding.imageUrl.load(R.drawable.ic_baseline_broken_image_24)
+            {
+                placeholder(R.drawable.ic_baseline_broken_image_24)
+            }
         }
     }
 
