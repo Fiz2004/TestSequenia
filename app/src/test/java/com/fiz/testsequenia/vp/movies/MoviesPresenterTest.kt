@@ -5,6 +5,10 @@ import android.content.res.Resources
 import com.fiz.testsequenia.model.DataMovies
 import com.fiz.testsequenia.model.MoviesRepository
 import com.fiz.testsequenia.model.network.models.MovieProperty
+import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.MockWebServer
+import okio.buffer
+import okio.source
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -14,6 +18,19 @@ import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class MoviesPresenterTest {
+
+    val mockWebServer = MockWebServer()
+
+    fun enqueue(fileName: String) {
+        val inputStream = javaClass.classLoader!!.getResourceAsStream(fileName)
+        val buffer = inputStream.source().buffer()
+
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(buffer.readString(Charsets.UTF_8))
+        )
+    }
 
     lateinit var moviesPresenter: MoviesPresenter
 
