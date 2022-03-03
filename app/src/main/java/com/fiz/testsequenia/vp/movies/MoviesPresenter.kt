@@ -6,14 +6,19 @@ import com.fiz.testsequenia.model.MoviesRepository
 
 class MoviesPresenter(
     private val view: IMoviesView,
-    private val dataMovies: DataMovies
+    private val dataMovies: DataMovies,
+    private val moviesRepository: MoviesRepository
 ) {
 
     fun onViewCreated() {
-        MoviesRepository.get().loadDataMovies(::updateUI)
+        loadData()
         initUI()
         if (dataMovies.isGenreSelected())
             updateUI()
+    }
+
+    private fun loadData() {
+        moviesRepository.loadDataMovies(::updateUI)
     }
 
     private fun initUI() {

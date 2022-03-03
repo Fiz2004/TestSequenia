@@ -50,7 +50,7 @@ class MoviesRepository {
 
         fun get(): MoviesRepository {
             return INSTANCE
-                ?: throw IllegalStateException("CrimeRepository must be initialized")
+                ?: throw IllegalStateException("MoviesRepository must be initialized")
         }
     }
 }

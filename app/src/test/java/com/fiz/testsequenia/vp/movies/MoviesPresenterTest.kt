@@ -77,8 +77,10 @@ class MoviesPresenterTest {
         val genres = listOf("Драма", "Комедия")
         Mockito.`when`(moviesRepository.getSortMovies()).thenReturn(sortMovies)
         Mockito.`when`(moviesRepository.getGenres()).thenReturn(genres)
+//        val callBack: () -> Unit=fun(){}
+//        Mockito.`when`(moviesRepository.loadDataMovies(callBack)).thenReturn()
 
-        moviesPresenter = MoviesPresenter(view, DataMovies((moviesRepository)))
+        moviesPresenter = MoviesPresenter(view, DataMovies((moviesRepository)), moviesRepository)
         moviesPresenter.onViewCreated()
 
         Mockito.verify(view, Mockito.times(1)).initUI()

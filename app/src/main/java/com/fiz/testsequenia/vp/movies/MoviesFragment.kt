@@ -28,7 +28,7 @@ class MoviesFragment : Fragment(), IMoviesView {
 
     override fun onAttach(context: Context) {
         moviesPresenter =
-            MoviesPresenter(this, DataMovies(MoviesRepository.get()))
+            MoviesPresenter(this, DataMovies(MoviesRepository.get()), MoviesRepository.get())
         super.onAttach(context)
     }
 
