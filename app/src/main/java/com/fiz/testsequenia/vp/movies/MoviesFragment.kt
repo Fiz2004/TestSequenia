@@ -60,7 +60,7 @@ class MoviesFragment : Fragment(), IMoviesView {
 
         binding.repeat.setOnClickListener {
             binding.repeat.visibility = View.GONE
-            MoviesRepository.get().loadDataMovies { moviesPresenter?.updateUI() }
+            moviesPresenter?.loadData()
         }
 
         moviesPresenter?.let {
@@ -77,7 +77,7 @@ class MoviesFragment : Fragment(), IMoviesView {
     override fun updateUI(
         dataMovies: DataMovies
     ) {
-        if (MoviesRepository.get().message == "") {
+        if (moviesPresenter?.message == "") {
 
             binding.circularProgressIndicator.visibility = View.GONE
             binding.repeat.visibility = View.GONE
@@ -93,7 +93,7 @@ class MoviesFragment : Fragment(), IMoviesView {
             state = null
         } else {
             binding.repeat.visibility = View.VISIBLE
-            Toast.makeText(context, MoviesRepository.get().message, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, moviesPresenter?.message, Toast.LENGTH_LONG).show()
         }
     }
 
