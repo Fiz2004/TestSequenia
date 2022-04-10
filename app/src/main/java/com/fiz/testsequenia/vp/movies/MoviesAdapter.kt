@@ -11,7 +11,6 @@ import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
-import com.fiz.testsequenia.model.DataMovies
 import com.fiz.testsequenia.model.network.models.MovieProperty
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
@@ -23,23 +22,23 @@ class MoviesAdapter(
     private val onClickMovie: (Int) -> Unit,
     private val onClickGenre: (String) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private lateinit var dataMovies: DataMovies
+    private lateinit var moviesWithGenresWithSelected: MoviesWithGenresWithSelected
 
     var data: List<DataItem> = listOf()
 
-    fun refreshData(dataMovies: DataMovies) {
-        this.dataMovies = dataMovies
+    fun refreshData(moviesWithGenresWithSelected: MoviesWithGenresWithSelected) {
+        this.moviesWithGenresWithSelected = moviesWithGenresWithSelected
 
         val newData: List<DataItem> =
             listOf(DataItem.Header(context.resources.getString(R.string.genres))) +
-                    dataMovies.genres?.map { DataItem.GenreItem(it) }!! +
+                    moviesWithGenresWithSelected.genres.map { DataItem.GenreItem(it) } +
                     listOf(
                         DataItem.Header(
                             context.resources.getString(R.string.movies)
                         )
-                    ) + dataMovies.getMovies()?.map {
+                    ) + moviesWithGenresWithSelected.movies.map {
                 DataItem.MoviePropertyItem(it)
-            }!!
+            }
 
         val diffCallback = DataDiffCallback(data, newData)
         val diffResult = DiffUtil.calculateDiff(diffCallback)
@@ -93,7 +92,11 @@ class MoviesAdapter(
             }
             is GenreViewHolder -> {
                 val genreItem = data[position] as DataItem.GenreItem
-                holder.bind(genreItem.genre, dataMovies.genreSelected, onClickGenre)
+                holder.bind(
+                    genreItem.genre,
+                    moviesWithGenresWithSelected.genreSelected,
+                    onClickGenre
+                )
             }
             is MovieViewHolder -> {
                 val moviePropertyItem = data[position] as DataItem.MoviePropertyItem
@@ -105,52 +108,52 @@ class MoviesAdapter(
     override fun getItemCount(): Int {
         return data.size
     }
+}
 
-    class HeaderViewHolder(private val binding: ListItemHeaderBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        var item: String? = null
+class HeaderViewHolder(private val binding: ListItemHeaderBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    var item: String? = null
 
-        fun bind(item: String) {
-            this.item = item
-            binding.text.text = item
+    fun bind(item: String) {
+        this.item = item
+        binding.text.text = item
+    }
+}
+
+class GenreViewHolder(private val binding: ListItemGenreBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    var item: String? = null
+
+    fun bind(item: String, genreSelected: String?, onClickGenre: (String) -> Unit) {
+        this.item = item
+        binding.genreButton.text = item
+        binding.genreButton.isChecked = genreSelected == item
+
+        binding.genreButton.setOnClickListener {
+            onClickGenre(item)
         }
     }
 
-    class GenreViewHolder(private val binding: ListItemGenreBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        var item: String? = null
+}
 
-        fun bind(item: String, genreSelected: String?, onClickGenre: (String) -> Unit) {
-            this.item = item
-            binding.genreButton.text = item
-            binding.genreButton.isChecked = genreSelected == item
+class MovieViewHolder(private val binding: ListItemMovieBinding) :
+    RecyclerView.ViewHolder(binding.root) {
+    var item: MovieProperty? = null
 
-            binding.genreButton.setOnClickListener {
-                onClickGenre(item)
+    fun bind(item: MovieProperty, callback: (Int) -> Unit) {
+        this.item = item
+        val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
+        item.imageUrl?.let {
+            binding.imgMovie.load(imgUri) {
+                placeholder(R.drawable.ic_baseline_cloud_download_24)
+                error(R.drawable.ic_baseline_broken_image_24)
             }
         }
-
-    }
-
-    class MovieViewHolder(private val binding: ListItemMovieBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        var item: MovieProperty? = null
-
-        fun bind(item: MovieProperty, callback: (Int) -> Unit) {
-            this.item = item
-            val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
-            item.imageUrl?.let {
-                binding.imgMovie.load(imgUri) {
-                    placeholder(R.drawable.ic_baseline_cloud_download_24)
-                    error(R.drawable.ic_baseline_broken_image_24)
-                }
-            }
-            if (item.imageUrl == null) {
-                binding.imgMovie.load(R.drawable.ic_baseline_broken_image_24)
-            }
-            binding.nameMovie.text = item.localizedName
-            binding.root.setOnClickListener { callback(item.id) }
+        if (item.imageUrl == null) {
+            binding.imgMovie.load(R.drawable.ic_baseline_broken_image_24)
         }
+        binding.nameMovie.text = item.localizedName
+        binding.root.setOnClickListener { callback(item.id) }
     }
 }
 

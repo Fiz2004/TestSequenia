@@ -1,11 +1,12 @@
 package com.fiz.testsequenia.vp.movies
 
-import com.fiz.testsequenia.model.DataMovies
-
 interface IMoviesView {
-    fun clickMovie(id: Int)
-    fun initUI()
+    fun moveMovieDetails(id: Int)
     fun updateUI(
-        dataMovies: DataMovies
+        moviesWithGenresWithSelected: MoviesWithGenresWithSelected
     )
+
+    fun showError(message: String)
+    fun showLoadView()
+    fun hideLoadView()
 }

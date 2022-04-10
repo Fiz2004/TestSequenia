@@ -1,7 +1,6 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
-import com.fiz.testsequenia.model.DataMovies
 import com.fiz.testsequenia.model.MoviesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,59 +9,57 @@ import kotlinx.coroutines.withContext
 
 class MoviesPresenter(
     private val view: IMoviesView,
-    private val dataMovies: DataMovies,
     private val moviesRepository: MoviesRepository
 ) {
-    var message = ""
-
-    fun onViewCreated() {
-        initUI()
-        loadData()
-        if (dataMovies.isGenreSelected())
-            updateUI()
-    }
+    private var message = ""
+    private var moviesWithGenresWithSelected: MoviesWithGenresWithSelected? =
+        MoviesWithGenresWithSelected()
 
     fun loadData() {
         CoroutineScope(Dispatchers.Default).launch {
+            message = ""
             try {
-                message = ""
-                moviesRepository.loadData()
+                view.showLoadView()
+                moviesWithGenresWithSelected =
+                    moviesWithGenresWithSelected?.loadData(moviesRepository.loadData())
             } catch (e: Exception) {
                 message = e.message.toString()
             }
             withContext(Dispatchers.Main) {
-                updateUI()
+                if (message == "") {
+                    view.hideLoadView()
+                    moviesWithGenresWithSelected?.let {
+                        view.updateUI(it)
+                    }
+                } else {
+                    view.showError(message)
+                }
             }
         }
     }
 
-    private fun initUI() {
-        view.initUI()
-    }
-
     fun clickMovie(id: Int) {
-        view.clickMovie(id)
+        view.moveMovieDetails(id)
     }
 
     fun clickGenre(genre: String?) {
-        if (dataMovies.genreSelected == genre) {
-            dataMovies.genreSelected = null
-        } else {
-            dataMovies.genreSelected = genre
+        moviesWithGenresWithSelected?.let {
+            moviesWithGenresWithSelected = it.setGenreSelected(genre)
         }
-        updateUI()
-    }
-
-    fun updateUI() {
-        view.updateUI(dataMovies)
-    }
-
-    fun onSaveInstanceState(outState: Bundle) {
-        dataMovies.genreSelected?.let { outState.putString(KEY_GENRE_SELECTED, it) }
+        moviesWithGenresWithSelected?.let {
+            view.updateUI(it)
+        }
     }
 
     fun setGenreSelected(genreSelected: String) {
-        dataMovies.genreSelected = genreSelected
+        moviesWithGenresWithSelected =
+            moviesWithGenresWithSelected?.setGenreSelected(genreSelected)
+    }
+
+    fun onSaveInstanceState(outState: Bundle) {
+        moviesWithGenresWithSelected?.genreSelected?.let {
+            outState.putString(KEY_GENRE_SELECTED, it)
+        }
     }
 
     companion object {

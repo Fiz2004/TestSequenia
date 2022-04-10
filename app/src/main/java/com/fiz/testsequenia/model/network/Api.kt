@@ -21,11 +21,11 @@ private val retrofit = Retrofit.Builder()
 
 interface MoviesApiService {
     @GET("sequeniatesttask/films.json")
-    suspend fun getProperties():
+    suspend fun fetchMovies():
             MoviesProperty
 }
 
-object MoviesApi {
+class MoviesApi {
     val retrofitService: MoviesApiService by lazy {
         retrofit.create(MoviesApiService::class.java)
     }

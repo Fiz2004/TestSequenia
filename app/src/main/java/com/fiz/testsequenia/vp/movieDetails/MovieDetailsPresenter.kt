@@ -7,7 +7,7 @@ class MovieDetailsPresenter(private val view: IMovieDetailsView, private val mov
     private var movie: MovieProperty? = null
 
     fun onCreateView(id: Int) {
-        movie = moviesRepository.getSortMovies()?.first { id == it.id }
+        movie = moviesRepository.getSortMovies().first { id == it.id }
     }
 
     fun onViewCreated() {
