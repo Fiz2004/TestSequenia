@@ -23,7 +23,7 @@ fun MovieDto.toMovie(): Movie {
         year = year ?: 0,
         rating = rating,
         imageUrl = imageUrl,
-        description = description,
+        description = description ?: "",
         genres = genres?.mapNotNull { it } ?: listOf()
     )
 }

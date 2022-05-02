@@ -9,7 +9,7 @@ interface MoviesContract {
     interface View {
         fun moveMovieDetails(id: Int)
         fun updateUI(
-            movies: List<Movie>, genres: List<Genre>
+            movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?
         )
 
         fun showError(message: String)

@@ -9,18 +9,21 @@ class MovieDetailsPresenter(
 ) : MovieDetailsContract.Presenter {
     private var movie: Movie? = null
 
-    override fun onCreateView(id: Int) {
+    override fun start(id: Int) {
         movie = moviesRepository.movies?.first { id == it.id }
     }
 
-    override fun onViewCreated() {
+
+    override fun load() {
         movie?.let {
-            view.onSetName(it.name)
-            view.onSetYear(it.year)
-            view.onSetRating(it.rating)
-            view.onSetDescription(it.description)
-            view.onSetLocalizedName(it.localizedName)
-            view.onSetImage(it.imageUrl)
+            view.updateUI(
+                name = it.name,
+                year = it.year,
+                rating = it.rating,
+                description = it.description,
+                localizedName = it.localizedName,
+                url = it.imageUrl
+            )
         }
     }
 }

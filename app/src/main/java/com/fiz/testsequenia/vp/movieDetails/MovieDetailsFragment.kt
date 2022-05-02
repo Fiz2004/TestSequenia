@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.fiz.testsequenia.R
@@ -30,46 +31,43 @@ class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
         binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
-        movieDetailsPresenter.onCreateView(args.id)
+        movieDetailsPresenter.start(args.id)
 
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        movieDetailsPresenter.onViewCreated()
+        movieDetailsPresenter.load()
     }
 
-    override fun onSetImage(url: String?) {
+    override fun updateUI(
+        name: String,
+        year: Int,
+        rating: Double?,
+        description: String,
+        localizedName: String,
+        url: String?
+    ) {
+
         binding.imageUrl.loadUrl(url)
 
-    }
+        binding.descriptionTextView.text = description
 
-    override fun onClickBack() {
-        findNavController().popBackStack()
-    }
-
-    override fun onSetDescription(description: String?) {
-        binding.descriptionTextView.text = description ?: ""
-    }
-
-    override fun onSetRating(rating: Double?) {
         binding.ratingTextView.text = if (rating != null)
             resources.getString(R.string.rating, rating)
         else
             ""
-    }
 
-    override fun onSetYear(year: Int) {
         binding.yearTextView.text = resources.getString(R.string.year, year)
-    }
 
-    override fun onSetName(name: String) {
         binding.nameTextView.text = name
+
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.appBarLayout)
+        toolbar.title = localizedName
     }
 
-    override fun onSetLocalizedName(localizedName: String) {
-        requireActivity().findViewById<androidx.appcompat.widget.Toolbar>(R.id.appBarLayout).title =
-            localizedName
+    override fun onClickBack() {
+        findNavController().popBackStack()
     }
 }

@@ -56,11 +56,11 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     }
 
     override fun updateUI(
-        movies: List<Movie>, genres: List<Genre>
+        movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?
     ) {
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
 
-        adapter.refreshData(movies, genres, moviesPresenter.genreSelected)
+        adapter.refreshData(movies, genres, genreSelected)
 
         val manager = binding.moviesRecyclerView.layoutManager
         (manager as? GridLayoutManager)?.spanSizeLookup =

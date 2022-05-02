@@ -3,20 +3,23 @@ package com.fiz.testsequenia.vp.movieDetails
 interface MovieDetailsContract {
 
     interface View {
-        fun onSetName(name: String)
-        fun onSetYear(year: Int)
-        fun onSetRating(rating: Double?)
-        fun onSetDescription(description: String?)
-        fun onSetLocalizedName(localizedName: String)
-        fun onSetImage(url: String?)
+        fun updateUI(
+            name: String,
+            year: Int,
+            rating: Double?,
+            description: String,
+            localizedName: String,
+            url: String?
+        )
+
         fun onClickBack()
     }
 
     interface Presenter {
 
-        fun onCreateView(id: Int)
+        fun start(id: Int)
 
-        fun onViewCreated()
+        fun load()
     }
 
 }

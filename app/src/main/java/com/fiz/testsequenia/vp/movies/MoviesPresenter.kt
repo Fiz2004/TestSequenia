@@ -13,9 +13,9 @@ class MoviesPresenter(
     private val moviesRepository: MoviesRepository
 ) : MoviesContract.Presenter {
     private var message = ""
-    var genres: List<Genre> = listOf()
+    private var genres: List<Genre> = listOf()
     private var movies: List<Movie> = listOf()
-    var genreSelected: Genre? = null
+    private var genreSelected: Genre? = null
 
     override fun loadMovies() {
         CoroutineScope(Dispatchers.Default).launch {
@@ -28,7 +28,7 @@ class MoviesPresenter(
                     CoroutineScope(Dispatchers.Main).launch {
                         if (message == "") {
                             view.setLoadingIndicator(active = false)
-                            view.updateUI(this@MoviesPresenter.movies, genres)
+                            view.updateUI(this@MoviesPresenter.movies, genres, genreSelected)
                         } else {
                             view.showError(message)
                         }
@@ -48,7 +48,7 @@ class MoviesPresenter(
         if (genre != null) {
             setGenreSelected1(genre)
         }
-        view.updateUI(movies, genres)
+        view.updateUI(movies, genres, genreSelected)
     }
 
     override fun setGenreSelected1(genreSelected: Genre) {
