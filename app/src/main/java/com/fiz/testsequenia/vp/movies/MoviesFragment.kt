@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.fiz.testsequenia.R
 import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
@@ -58,7 +57,6 @@ class MoviesFragment : Fragment(), IMoviesView {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.topAppBar.title = resources.getString(R.string.main)
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(activity, 2)
 
         binding.repeat.setOnClickListener {

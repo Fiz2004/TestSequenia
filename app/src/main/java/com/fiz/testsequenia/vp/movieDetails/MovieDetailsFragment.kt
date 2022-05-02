@@ -33,11 +33,6 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
         movieDetailsPresenter.onCreateView(args.id)
 
-
-        binding.topAppBar.setNavigationOnClickListener {
-            movieDetailsPresenter.clickBack()
-        }
-
         return binding.root
     }
 
@@ -87,6 +82,7 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
     }
 
     override fun onSetLocalizedName(localizedName: String) {
-        binding.topAppBar.title = localizedName
+        requireActivity().findViewById<androidx.appcompat.widget.Toolbar>(R.id.appBarLayout).title =
+            localizedName
     }
 }

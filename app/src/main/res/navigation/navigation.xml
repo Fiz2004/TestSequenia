@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/moviesFragment"
         android:name="com.fiz.testsequenia.vp.movies.MoviesFragment"
-        android:label="fragment_movies"
+        android:label="@string/main"
         tools:layout="@layout/fragment_movies" >
         <action
             android:id="@+id/action_moviesFragment_to_movieDetailsFragment"

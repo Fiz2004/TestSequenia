@@ -11,22 +11,6 @@
         android:layout_height="wrap_content"
         tools:context=".vp.movieDetails.MovieDetailsFragment">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/topAppBar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-                app:title="page"
-                app:titleTextColor="?attr/colorOnPrimary" />
-        </com.google.android.material.appbar.AppBarLayout>
-
         <ImageView
             android:id="@+id/imageUrl"
             android:layout_width="200dp"
@@ -35,7 +19,7 @@
             android:adjustViewBounds="true"
             android:contentDescription="@string/image_movie"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout"
+            app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -48,15 +32,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
-            app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/yearTextView"
-            android:textColor="?attr/colorOnPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:textAlignment="viewStart"
+            android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
@@ -64,11 +48,11 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/ratingTextView"
-            android:textColor="?attr/colorOnPrimary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:textAlignment="viewStart"
+            android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
@@ -80,8 +64,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:padding="16dp"
-            android:textColor="?attr/colorOnPrimary"
             android:singleLine="false"
+            android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageUrl" />

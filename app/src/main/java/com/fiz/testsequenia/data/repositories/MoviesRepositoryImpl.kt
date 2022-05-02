@@ -4,23 +4,29 @@ import com.fiz.testsequenia.data.data_sources.remote.MoviesApi
 import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
 import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
-class MoviesRepositoryImpl(private val moviesApi: MoviesApi) : MoviesRepository {
+class MoviesRepositoryImpl(
+    private val moviesApi: MoviesApi,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+) : MoviesRepository {
     private var genres: List<String>? = null
     private var sortMovies: List<MovieDto>? = null
 
-    override suspend fun loadData(): MoviesWithGenresWithSelected {
+    override suspend fun loadData(): MoviesWithGenresWithSelected = withContext(dispatcher) {
         if ((genres?.isEmpty() == true || genres == null)
             && (sortMovies?.isEmpty() == true) || sortMovies == null
         ) {
-            val listResult = moviesApi.fetchMovies()
 
-            genres = listResult.films.flatMap { movie -> movie.genres }.distinct()
+            val response = moviesApi.fetchMovies()
+            val movies: List<MovieDto> = response.films
 
-            val movies = listResult.films
+            genres = movies.flatMap { movie -> movie.genres }.distinct()
             sortMovies = movies.sortedBy { it.localizedName }
         }
-        return MoviesWithGenresWithSelected(
+        return@withContext MoviesWithGenresWithSelected(
             genres = genres ?: listOf(),
             sortMovies = sortMovies ?: listOf()
         )
