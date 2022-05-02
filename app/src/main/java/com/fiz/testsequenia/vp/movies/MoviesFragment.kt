@@ -15,8 +15,6 @@ import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 class MoviesFragment : Fragment(), MoviesContract.View {
 
-    private var state: Parcelable? = null
-
     private val moviesRepository by lazy {
         (requireActivity().application as App).appContainer.moviesRepository
     }
@@ -59,8 +57,8 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     override fun updateUI(
         moviesWithGenresWithSelected: MoviesWithGenresWithSelected
     ) {
-        if (state == null)
-            state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+        val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+
         adapter.refreshData(moviesWithGenresWithSelected)
 
         val manager = binding.moviesRecyclerView.layoutManager
@@ -71,8 +69,6 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         binding.moviesRecyclerView.adapter = adapter
 
         binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
-        if (moviesWithGenresWithSelected.genres.isNotEmpty() || moviesWithGenresWithSelected.movies.isNotEmpty())
-            state = null
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -101,10 +97,8 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         }
 
     override fun moveMovieDetails(id: Int) {
-        state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
-        findNavController().navigate(
-            MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
-        )
+        val action = MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
+        findNavController().navigate(action)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
@@ -112,7 +106,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
         val state: Parcelable? = savedInstanceState?.getParcelable(RECYCLER_VIEW_STATE)
         if (state != null)
-            this.state = state
+            binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
 
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
         if (genreSelected != null)
@@ -121,8 +115,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (state == null)
-            state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+        val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         outState.putParcelable(RECYCLER_VIEW_STATE, state)
         moviesPresenter.onSaveInstanceState(outState)
     }
