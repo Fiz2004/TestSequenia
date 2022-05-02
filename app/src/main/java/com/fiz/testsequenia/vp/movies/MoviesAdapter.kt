@@ -8,10 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.fiz.testsequenia.R
-import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
+import com.fiz.testsequenia.domain.models.Genre
+import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
@@ -21,7 +22,7 @@ private const val ITEM_VIEW_TYPE_MOVIE = 2
 class MoviesAdapter(
     private val context: Context,
     private val onClickMovie: ((Int) -> Unit)?,
-    private val onClickGenre: ((String) -> Unit)?
+    private val onClickGenre: ((Genre) -> Unit)?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private lateinit var moviesWithGenresWithSelected: MoviesWithGenresWithSelected
 
@@ -123,11 +124,11 @@ class HeaderViewHolder(private val binding: ListItemHeaderBinding) :
 
 class GenreViewHolder(private val binding: ListItemGenreBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    var item: String? = null
+    var item: Genre? = null
 
-    fun bind(item: String, genreSelected: String?, onClickGenre: ((String) -> Unit)?) {
+    fun bind(item: Genre, genreSelected: Genre?, onClickGenre: ((Genre) -> Unit)?) {
         this.item = item
-        binding.genreButton.text = item
+        binding.genreButton.text = item.name
         binding.genreButton.isChecked = genreSelected == item
 
         binding.genreButton.setOnClickListener {
@@ -141,9 +142,9 @@ class GenreViewHolder(private val binding: ListItemGenreBinding) :
 
 class MovieViewHolder(private val binding: ListItemMovieBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    var item: MovieDto? = null
+    var item: Movie? = null
 
-    fun bind(item: MovieDto, callback: ((Int) -> Unit)?) {
+    fun bind(item: Movie, callback: ((Int) -> Unit)?) {
         this.item = item
         val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
         item.imageUrl?.let {
@@ -165,8 +166,8 @@ class MovieViewHolder(private val binding: ListItemMovieBinding) :
 }
 
 sealed class DataItem {
-    data class GenreItem(val genre: String) : DataItem()
-    data class MoviePropertyItem(val movieDto: MovieDto) : DataItem()
+    data class GenreItem(val genre: Genre) : DataItem()
+    data class MoviePropertyItem(val movieDto: Movie) : DataItem()
     data class Header(val title: String) : DataItem()
 }
 

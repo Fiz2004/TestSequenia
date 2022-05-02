@@ -2,6 +2,10 @@ package com.fiz.testsequenia.data.repositories
 
 import com.fiz.testsequenia.data.data_sources.remote.MoviesApi
 import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
+import com.fiz.testsequenia.data.data_sources.remote.dto.toGenre
+import com.fiz.testsequenia.data.data_sources.remote.dto.toMovie
+import com.fiz.testsequenia.domain.models.Genre
+import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import kotlinx.coroutines.CoroutineDispatcher
@@ -12,8 +16,8 @@ class MoviesRepositoryImpl(
     private val moviesApi: MoviesApi,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : MoviesRepository {
-    private var genres: List<String>? = null
-    private var sortMovies: List<MovieDto>? = null
+    private var genres: List<Genre>? = null
+    private var sortMovies: List<Movie>? = null
 
     override suspend fun loadData(): MoviesWithGenresWithSelected = withContext(dispatcher) {
         if ((genres?.isEmpty() == true || genres == null)
@@ -23,8 +27,8 @@ class MoviesRepositoryImpl(
             val response = moviesApi.fetchMovies()
             val movies: List<MovieDto> = response.films
 
-            genres = movies.flatMap { movie -> movie.genres }.distinct()
-            sortMovies = movies.sortedBy { it.localizedName }
+            genres = movies.flatMap { movie -> movie.genres }.distinct().map { it.toGenre() }
+            sortMovies = movies.sortedBy { it.localizedName }.map { it.toMovie() }
         }
         return@withContext MoviesWithGenresWithSelected(
             genres = genres ?: listOf(),
@@ -32,11 +36,11 @@ class MoviesRepositoryImpl(
         )
     }
 
-    override fun getGenres(): List<String> {
+    override fun getGenres(): List<Genre> {
         return genres ?: listOf()
     }
 
-    override fun getSortMovies(): List<MovieDto> {
+    override fun getSortMovies(): List<Movie> {
         return sortMovies ?: listOf()
     }
 

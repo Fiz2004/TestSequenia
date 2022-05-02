@@ -1,11 +1,9 @@
 package com.fiz.testsequenia.domain.models
 
-import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
-
 data class MoviesWithGenresWithSelected(
-    val genres: List<String> = listOf(),
-    private val sortMovies: List<MovieDto> = listOf(),
-    val genreSelected: String? = null
+    val genres: List<Genre> = listOf(),
+    private val sortMovies: List<Movie> = listOf(),
+    val genreSelected: Genre? = null
 ) {
     val movies
         get() = if (isGenreSelected())
@@ -14,14 +12,14 @@ data class MoviesWithGenresWithSelected(
             sortMovies
 
     private fun getFilterMovies() = sortMovies.filter {
-        it.genres.contains(genreSelected)
+        it.genres.contains(genreSelected?.name)
     }
 
     fun isGenreSelected(): Boolean {
         return (genreSelected != null)
     }
 
-    fun setGenreSelected(genre: String?): MoviesWithGenresWithSelected {
+    fun setGenreSelected(genre: Genre?): MoviesWithGenresWithSelected {
         val genreSelected = if (genreSelected == genre) {
             null
         } else {
@@ -37,3 +35,18 @@ data class MoviesWithGenresWithSelected(
         )
     }
 }
+
+data class Movie(
+    val id: Int,
+    val localizedName: String,
+    val name: String,
+    val year: Int,
+    val rating: Double?,
+    val imageUrl: String?,
+    val description: String?,
+    val genres: List<String>
+)
+
+data class Genre(
+    val name: String
+)

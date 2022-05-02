@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
+import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 class MoviesFragment : Fragment(), MoviesContract.View {
@@ -110,7 +111,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
         if (genreSelected != null)
-            moviesPresenter.setGenreSelected(genreSelected)
+            moviesPresenter.setGenreSelected(Genre(name = genreSelected))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

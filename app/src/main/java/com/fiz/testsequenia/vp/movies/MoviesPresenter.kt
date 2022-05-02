@@ -1,6 +1,7 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
+import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,7 @@ class MoviesPresenter(
         view.moveMovieDetails(id)
     }
 
-    override fun clickGenre(genre: String?) {
+    override fun clickGenre(genre: Genre?) {
         moviesWithGenresWithSelected?.let {
             moviesWithGenresWithSelected = it.setGenreSelected(genre)
         }
@@ -52,14 +53,14 @@ class MoviesPresenter(
         }
     }
 
-    override fun setGenreSelected(genreSelected: String) {
+    override fun setGenreSelected(genreSelected: Genre) {
         moviesWithGenresWithSelected =
             moviesWithGenresWithSelected?.setGenreSelected(genreSelected)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         moviesWithGenresWithSelected?.genreSelected?.let {
-            outState.putString(KEY_GENRE_SELECTED, it)
+            outState.putString(KEY_GENRE_SELECTED, it.name)
         }
     }
 

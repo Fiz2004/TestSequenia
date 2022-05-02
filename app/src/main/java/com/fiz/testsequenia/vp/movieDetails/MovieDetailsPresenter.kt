@@ -1,13 +1,13 @@
 package com.fiz.testsequenia.vp.movieDetails
 
-import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
+import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 
 class MovieDetailsPresenter(
     private val view: MovieDetailsContract.View,
     private val moviesRepository: MoviesRepository
 ) : MovieDetailsContract.Presenter {
-    private var movie: MovieDto? = null
+    private var movie: Movie? = null
 
     override fun onCreateView(id: Int) {
         movie = moviesRepository.getSortMovies().first { id == it.id }
