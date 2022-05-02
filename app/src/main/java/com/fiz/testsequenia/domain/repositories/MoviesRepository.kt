@@ -2,13 +2,10 @@ package com.fiz.testsequenia.domain.repositories
 
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
-import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 interface MoviesRepository {
+    val genres: List<Genre>?
+    val movies: List<Movie>?
 
-    suspend fun loadData(): MoviesWithGenresWithSelected
-
-    fun getGenres(): List<Genre>
-
-    fun getSortMovies(): List<Movie>
+    suspend fun loadData(callBack: (List<Movie>, List<Genre>) -> Unit)
 }

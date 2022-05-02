@@ -6,7 +6,6 @@ import com.fiz.testsequenia.data.data_sources.remote.dto.toGenre
 import com.fiz.testsequenia.data.data_sources.remote.dto.toMovie
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
-import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -16,32 +15,26 @@ class MoviesRepositoryImpl(
     private val moviesApi: MoviesApi,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : MoviesRepository {
-    private var genres: List<Genre>? = null
-    private var sortMovies: List<Movie>? = null
+    override var genres: List<Genre>? = null; private set
+    override var movies: List<Movie>? = null; private set
 
-    override suspend fun loadData(): MoviesWithGenresWithSelected = withContext(dispatcher) {
-        if ((genres?.isEmpty() == true || genres == null)
-            && (sortMovies?.isEmpty() == true) || sortMovies == null
-        ) {
+    override suspend fun loadData(callBack: (List<Movie>, List<Genre>) -> Unit) {
+        withContext(dispatcher) {
+            if ((genres?.isEmpty() == true || genres == null)
+                && (movies?.isEmpty() == true) || movies == null
+            ) {
+                val response = moviesApi.fetchMovies()
+                val movies: List<MovieDto> = response.films
 
-            val response = moviesApi.fetchMovies()
-            val movies: List<MovieDto> = response.films
-
-            genres = movies.flatMap { movie -> movie.genres }.distinct().map { it.toGenre() }
-            sortMovies = movies.sortedBy { it.localizedName }.map { it.toMovie() }
+                genres = movies.flatMap { movie -> movie.genres }.distinct().map { it.toGenre() }
+                this@MoviesRepositoryImpl.movies =
+                    movies.sortedBy { it.localizedName }.map { it.toMovie() }
+            }
+            callBack(
+                movies ?: listOf(),
+                genres ?: listOf()
+            )
         }
-        return@withContext MoviesWithGenresWithSelected(
-            genres = genres ?: listOf(),
-            sortMovies = sortMovies ?: listOf()
-        )
-    }
-
-    override fun getGenres(): List<Genre> {
-        return genres ?: listOf()
-    }
-
-    override fun getSortMovies(): List<Movie> {
-        return sortMovies ?: listOf()
     }
 
     companion object {

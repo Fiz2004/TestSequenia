@@ -10,7 +10,7 @@ class MovieDetailsPresenter(
     private var movie: Movie? = null
 
     override fun onCreateView(id: Int) {
-        movie = moviesRepository.getSortMovies().first { id == it.id }
+        movie = moviesRepository.movies?.first { id == it.id }
     }
 
     override fun onViewCreated() {

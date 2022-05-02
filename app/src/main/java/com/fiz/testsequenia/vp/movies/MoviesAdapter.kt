@@ -13,7 +13,6 @@ import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
-import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_GENRE = 1
@@ -24,21 +23,30 @@ class MoviesAdapter(
     private val onClickMovie: ((Int) -> Unit)?,
     private val onClickGenre: ((Genre) -> Unit)?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private lateinit var moviesWithGenresWithSelected: MoviesWithGenresWithSelected
+    private var genres: List<Genre> = listOf()
+    private var movies: List<Movie> = listOf()
+    var genreSelected: Genre? = null
 
     var data: List<DataItem> = listOf()
 
-    fun refreshData(moviesWithGenresWithSelected: MoviesWithGenresWithSelected) {
-        this.moviesWithGenresWithSelected = moviesWithGenresWithSelected
+    fun refreshData(movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?) {
+        this.movies = movies
+        this.genres = genres
+        this.genreSelected = genreSelected
 
         val newData: List<DataItem> =
             listOf(DataItem.Header(context.resources.getString(R.string.genres))) +
-                    moviesWithGenresWithSelected.genres.map { DataItem.GenreItem(it) } +
+                    genres.map { DataItem.GenreItem(it) } +
                     listOf(
                         DataItem.Header(
                             context.resources.getString(R.string.movies)
                         )
-                    ) + moviesWithGenresWithSelected.movies.map {
+                    ) + (if ((genreSelected != null))
+                movies.filter {
+                    it.genres.contains(genreSelected.name)
+                }
+            else
+                movies).map {
                 DataItem.MoviePropertyItem(it)
             }
 
@@ -96,7 +104,7 @@ class MoviesAdapter(
                 val genreItem = data[position] as DataItem.GenreItem
                 holder.bind(
                     genreItem.genre,
-                    moviesWithGenresWithSelected.genreSelected,
+                    genreSelected,
                     onClickGenre
                 )
             }

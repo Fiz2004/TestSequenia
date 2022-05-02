@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.domain.models.Genre
-import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
+import com.fiz.testsequenia.domain.models.Movie
 
 class MoviesFragment : Fragment(), MoviesContract.View {
 
@@ -56,15 +56,15 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     }
 
     override fun updateUI(
-        moviesWithGenresWithSelected: MoviesWithGenresWithSelected
+        movies: List<Movie>, genres: List<Genre>
     ) {
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
 
-        adapter.refreshData(moviesWithGenresWithSelected)
+        adapter.refreshData(movies, genres, moviesPresenter.genreSelected)
 
         val manager = binding.moviesRecyclerView.layoutManager
         (manager as? GridLayoutManager)?.spanSizeLookup =
-            spanSizeLookup(moviesWithGenresWithSelected.genres.size)
+            spanSizeLookup(genres.size)
 
         binding.moviesRecyclerView.layoutManager = manager
         binding.moviesRecyclerView.adapter = adapter
@@ -111,7 +111,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
         if (genreSelected != null)
-            moviesPresenter.setGenreSelected(Genre(name = genreSelected))
+            moviesPresenter.setGenreSelected1(Genre(name = genreSelected))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
