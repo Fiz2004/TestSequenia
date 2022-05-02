@@ -1,9 +1,10 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-}
 
-apply plugin: 'androidx.navigation.safeargs'
+    // Navigation
+    id 'androidx.navigation.safeargs'
+}
 
 android {
     compileSdk 32
@@ -12,8 +13,8 @@ android {
         applicationId "com.fiz.testsequenia"
         minSdk 22
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,13 +49,15 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.fragment:fragment-ktx:1.4.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt'
 
-    // navigation
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1'
+
+    // Navigation
     implementation 'androidx.navigation:navigation-fragment-ktx:2.4.2'
     implementation 'androidx.navigation:navigation-ui-ktx:2.4.2'
 
-    // retrofit
+    // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
 
     // Moshi
@@ -65,22 +68,23 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.13.1'
 
     // Coil
-    implementation "io.coil-kt:coil:1.1.1"
+    implementation "io.coil-kt:coil:1.4.0"
 
-    // Mockito
-    testImplementation 'org.mockito:mockito-core:4.4.0'
-    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
-    testImplementation 'org.mockito:mockito-inline:4.4.0'
-    testImplementation 'io.mockk:mockk:1.12.3'
+    debugImplementation 'androidx.fragment:fragment-testing:1.4.1'
 
     testImplementation 'junit:junit:4.13.2'
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation 'com.squareup.okhttp3:mockwebserver:5.0.0-alpha.7'
+
+    // Mockito
+    testImplementation 'org.mockito:mockito-core:4.5.1'
+    testImplementation 'org.mockito.kotlin:mockito-kotlin:4.0.0'
+    testImplementation 'org.mockito:mockito-inline:4.5.1'
+    testImplementation 'io.mockk:mockk:1.12.3'
+
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation "androidx.test:core-ktx:1.4.0"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.4.0'
     androidTestImplementation 'androidx.navigation:navigation-testing:2.4.2'
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
-    testImplementation 'com.squareup.okhttp3:mockwebserver:5.0.0-alpha.6'
-
-    debugImplementation 'androidx.fragment:fragment-testing:1.4.1'
 }
