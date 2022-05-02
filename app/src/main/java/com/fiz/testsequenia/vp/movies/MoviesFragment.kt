@@ -10,20 +10,31 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.R
+import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
-import com.fiz.testsequenia.model.MoviesRepository
+import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 class MoviesFragment : Fragment(), IMoviesView {
-    private var _binding: FragmentMoviesBinding? = null
-    val binding get() = _binding!!
-
-    private var moviesPresenter: MoviesPresenter =
-        MoviesPresenter(this, MoviesRepository.get())
-
-    private lateinit var adapter: MoviesAdapter
-    private lateinit var manager: GridLayoutManager
 
     private var state: Parcelable? = null
+
+    private val moviesRepository by lazy {
+        (requireActivity().application as App).appContainer.moviesRepository
+    }
+
+    private val moviesPresenter: MoviesPresenter by lazy {
+        MoviesPresenter(this, moviesRepository)
+    }
+
+    private val adapter: MoviesAdapter by lazy {
+        MoviesAdapter(
+            requireContext(),
+            moviesPresenter::clickMovie,
+            moviesPresenter::clickGenre
+        )
+    }
+
+    private lateinit var binding: FragmentMoviesBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,31 +51,19 @@ class MoviesFragment : Fragment(), IMoviesView {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMoviesBinding.inflate(inflater, container, false)
+        binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.topAppBar.title = resources.getString(R.string.main)
+        binding.moviesRecyclerView.layoutManager = GridLayoutManager(activity, 2)
 
         binding.repeat.setOnClickListener {
             moviesPresenter.loadData()
         }
-
-        adapter = MoviesAdapter(
-            requireContext(),
-            moviesPresenter::clickMovie,
-            moviesPresenter::clickGenre
-        )
-
-        manager = GridLayoutManager(activity, 2)
 
         moviesPresenter.loadData()
     }
@@ -75,9 +74,12 @@ class MoviesFragment : Fragment(), IMoviesView {
         if (state == null)
             state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         adapter.refreshData(moviesWithGenresWithSelected)
-        manager.spanSizeLookup = spanSizeLookup(moviesWithGenresWithSelected.genres.size)
 
+        val manager = binding.moviesRecyclerView.layoutManager
+        (manager as? GridLayoutManager)?.spanSizeLookup =
+            spanSizeLookup(moviesWithGenresWithSelected.genres.size)
         binding.moviesRecyclerView.layoutManager = manager
+
         binding.moviesRecyclerView.adapter = adapter
         binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
         if (moviesWithGenresWithSelected.genres.isNotEmpty() || moviesWithGenresWithSelected.movies.isNotEmpty())

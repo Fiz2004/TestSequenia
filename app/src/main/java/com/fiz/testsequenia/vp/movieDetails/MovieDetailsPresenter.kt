@@ -1,10 +1,10 @@
 package com.fiz.testsequenia.vp.movieDetails
 
-import com.fiz.testsequenia.model.MoviesRepository
-import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
 
 class MovieDetailsPresenter(private val view: IMovieDetailsView, private val moviesRepository: MoviesRepository) {
-    private var movie: MovieProperty? = null
+    private var movie: MovieDto? = null
 
     fun onCreateView(id: Int) {
         movie = moviesRepository.getSortMovies().first { id == it.id }

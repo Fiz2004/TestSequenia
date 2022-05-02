@@ -9,32 +9,33 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import coil.load
 import com.fiz.testsequenia.R
+import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
-import com.fiz.testsequenia.model.MoviesRepository
 
 class MovieDetailsFragment : Fragment(), IMovieDetailsView {
-    private var _binding: FragmentMovieDetailsBinding? = null
-    private val binding get() = _binding!!
 
-    private var movieDetailsPresenter: MovieDetailsPresenter? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        movieDetailsPresenter = MovieDetailsPresenter(this, MoviesRepository.get())
+    private val moviesRepository by lazy {
+        (requireActivity().application as App).appContainer.moviesRepository
     }
+
+    private val movieDetailsPresenter: MovieDetailsPresenter by lazy {
+        MovieDetailsPresenter(this, moviesRepository)
+    }
+
+    private lateinit var binding: FragmentMovieDetailsBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
+        binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
-        movieDetailsPresenter?.onCreateView(args.id)
+        movieDetailsPresenter.onCreateView(args.id)
 
 
         binding.topAppBar.setNavigationOnClickListener {
-            movieDetailsPresenter?.clickBack()
+            movieDetailsPresenter.clickBack()
         }
 
         return binding.root
@@ -42,7 +43,7 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        movieDetailsPresenter?.onViewCreated()
+        movieDetailsPresenter.onViewCreated()
     }
 
     override fun onSetImage(url: String?) {
@@ -88,12 +89,4 @@ class MovieDetailsFragment : Fragment(), IMovieDetailsView {
     override fun onSetLocalizedName(localizedName: String) {
         binding.topAppBar.title = localizedName
     }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-
-        movieDetailsPresenter = null
-    }
-
 }

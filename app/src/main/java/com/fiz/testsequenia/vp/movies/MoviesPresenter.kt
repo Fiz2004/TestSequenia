@@ -1,7 +1,8 @@
 package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
-import com.fiz.testsequenia.model.MoviesRepository
+import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

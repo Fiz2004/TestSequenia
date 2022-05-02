@@ -1,10 +1,10 @@
-package com.fiz.testsequenia.vp.movies
+package com.fiz.testsequenia.domain.models
 
-import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
 
 data class MoviesWithGenresWithSelected(
     val genres: List<String> = listOf(),
-    private val sortMovies: List<MovieProperty> = listOf(),
+    private val sortMovies: List<MovieDto> = listOf(),
     val genreSelected: String? = null
 ) {
     val movies

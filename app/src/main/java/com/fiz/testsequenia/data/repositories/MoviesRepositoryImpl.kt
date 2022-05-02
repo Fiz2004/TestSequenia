@@ -1,18 +1,19 @@
-package com.fiz.testsequenia.model
+package com.fiz.testsequenia.data.repositories
 
-import com.fiz.testsequenia.model.network.MoviesApi
-import com.fiz.testsequenia.model.network.models.MovieProperty
-import com.fiz.testsequenia.vp.movies.MoviesWithGenresWithSelected
+import com.fiz.testsequenia.data.data_sources.remote.MoviesApi
+import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
+import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
 
-class MoviesRepository(private val moviesApi: MoviesApi) {
+class MoviesRepositoryImpl(private val moviesApi: MoviesApi) : MoviesRepository {
     private var genres: List<String>? = null
-    private var sortMovies: List<MovieProperty>? = null
+    private var sortMovies: List<MovieDto>? = null
 
-    suspend fun loadData(): MoviesWithGenresWithSelected {
+    override suspend fun loadData(): MoviesWithGenresWithSelected {
         if ((genres?.isEmpty() == true || genres == null)
             && (sortMovies?.isEmpty() == true) || sortMovies == null
         ) {
-            val listResult = moviesApi.retrofitService.fetchMovies()
+            val listResult = moviesApi.fetchMovies()
 
             genres = listResult.films.flatMap { movie -> movie.genres }.distinct()
 
@@ -25,23 +26,23 @@ class MoviesRepository(private val moviesApi: MoviesApi) {
         )
     }
 
-    fun getGenres(): List<String> {
+    override fun getGenres(): List<String> {
         return genres ?: listOf()
     }
 
-    fun getSortMovies(): List<MovieProperty> {
+    override fun getSortMovies(): List<MovieDto> {
         return sortMovies ?: listOf()
     }
 
     companion object {
-        private var INSTANCE: MoviesRepository? = null
+        private var INSTANCE: MoviesRepositoryImpl? = null
         fun initialize(moviesApi: MoviesApi) {
             if (INSTANCE == null) {
-                INSTANCE = MoviesRepository(moviesApi)
+                INSTANCE = MoviesRepositoryImpl(moviesApi)
             }
         }
 
-        fun get(): MoviesRepository {
+        fun get(): MoviesRepositoryImpl {
             return INSTANCE
                 ?: throw IllegalStateException("MoviesRepository must be initialized")
         }

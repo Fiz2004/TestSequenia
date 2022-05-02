@@ -1,8 +1,8 @@
-package com.fiz.testsequenia.model.network.models
+package com.fiz.testsequenia.data.data_sources.remote.dto
 
 import com.squareup.moshi.Json
 
-data class MovieProperty(
+data class MovieDto(
     val id: Int,
     @Json(name = "localized_name") val localizedName: String,
     val name: String,

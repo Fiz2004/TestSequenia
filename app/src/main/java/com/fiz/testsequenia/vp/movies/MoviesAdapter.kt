@@ -8,10 +8,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.fiz.testsequenia.R
+import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
 import com.fiz.testsequenia.databinding.ListItemGenreBinding
 import com.fiz.testsequenia.databinding.ListItemHeaderBinding
 import com.fiz.testsequenia.databinding.ListItemMovieBinding
-import com.fiz.testsequenia.model.network.models.MovieProperty
+import com.fiz.testsequenia.domain.models.MoviesWithGenresWithSelected
 
 private const val ITEM_VIEW_TYPE_HEADER = 0
 private const val ITEM_VIEW_TYPE_GENRE = 1
@@ -19,8 +20,8 @@ private const val ITEM_VIEW_TYPE_MOVIE = 2
 
 class MoviesAdapter(
     private val context: Context,
-    private val onClickMovie: (Int) -> Unit,
-    private val onClickGenre: (String) -> Unit
+    private val onClickMovie: ((Int) -> Unit)?,
+    private val onClickGenre: ((String) -> Unit)?
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private lateinit var moviesWithGenresWithSelected: MoviesWithGenresWithSelected
 
@@ -100,7 +101,7 @@ class MoviesAdapter(
             }
             is MovieViewHolder -> {
                 val moviePropertyItem = data[position] as DataItem.MoviePropertyItem
-                holder.bind(moviePropertyItem.movieProperty, onClickMovie)
+                holder.bind(moviePropertyItem.movieDto, onClickMovie)
             }
         }
     }
@@ -124,13 +125,15 @@ class GenreViewHolder(private val binding: ListItemGenreBinding) :
     RecyclerView.ViewHolder(binding.root) {
     var item: String? = null
 
-    fun bind(item: String, genreSelected: String?, onClickGenre: (String) -> Unit) {
+    fun bind(item: String, genreSelected: String?, onClickGenre: ((String) -> Unit)?) {
         this.item = item
         binding.genreButton.text = item
         binding.genreButton.isChecked = genreSelected == item
 
         binding.genreButton.setOnClickListener {
-            onClickGenre(item)
+            if (onClickGenre != null) {
+                onClickGenre(item)
+            }
         }
     }
 
@@ -138,9 +141,9 @@ class GenreViewHolder(private val binding: ListItemGenreBinding) :
 
 class MovieViewHolder(private val binding: ListItemMovieBinding) :
     RecyclerView.ViewHolder(binding.root) {
-    var item: MovieProperty? = null
+    var item: MovieDto? = null
 
-    fun bind(item: MovieProperty, callback: (Int) -> Unit) {
+    fun bind(item: MovieDto, callback: ((Int) -> Unit)?) {
         this.item = item
         val imgUri = item.imageUrl?.toUri()?.buildUpon()?.scheme("https")?.build()
         item.imageUrl?.let {
@@ -153,13 +156,17 @@ class MovieViewHolder(private val binding: ListItemMovieBinding) :
             binding.imgMovie.load(R.drawable.ic_baseline_broken_image_24)
         }
         binding.nameMovie.text = item.localizedName
-        binding.root.setOnClickListener { callback(item.id) }
+        binding.root.setOnClickListener {
+            if (callback != null) {
+                callback(item.id)
+            }
+        }
     }
 }
 
 sealed class DataItem {
     data class GenreItem(val genre: String) : DataItem()
-    data class MoviePropertyItem(val movieProperty: MovieProperty) : DataItem()
+    data class MoviePropertyItem(val movieDto: MovieDto) : DataItem()
     data class Header(val title: String) : DataItem()
 }
 
@@ -179,7 +186,7 @@ class DataDiffCallback(private val oldList: List<DataItem>, private val newList:
         if (oldList[oldItemPosition] is DataItem.GenreItem && newList[newItemPosition] is DataItem.GenreItem)
             return (oldList[oldItemPosition] as DataItem.GenreItem).genre == (newList[newItemPosition] as DataItem.GenreItem).genre
         if (oldList[oldItemPosition] is DataItem.MoviePropertyItem && newList[newItemPosition] is DataItem.MoviePropertyItem)
-            return (oldList[oldItemPosition] as DataItem.MoviePropertyItem).movieProperty.id == (newList[newItemPosition] as DataItem.MoviePropertyItem).movieProperty.id
+            return (oldList[oldItemPosition] as DataItem.MoviePropertyItem).movieDto.id == (newList[newItemPosition] as DataItem.MoviePropertyItem).movieDto.id
         return false
     }
 
