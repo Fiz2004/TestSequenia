@@ -10,9 +10,10 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="?attr/colorOnPrimary"></androidx.appcompat.widget.Toolbar>
+        app:titleTextColor="?attr/colorOnPrimary" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/myNavHostFragment"

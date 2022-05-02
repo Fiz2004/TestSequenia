@@ -9,18 +9,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MoviesPresenter(
-    private val view: IMoviesView,
+    private val view: MoviesContract.View,
     private val moviesRepository: MoviesRepository
-) {
+) : MoviesContract.Presenter {
     private var message = ""
     private var moviesWithGenresWithSelected: MoviesWithGenresWithSelected? =
         MoviesWithGenresWithSelected()
 
-    fun loadData() {
+    override fun loadMovies() {
         CoroutineScope(Dispatchers.Default).launch {
             message = ""
             try {
-                view.showLoadView()
+                view.setLoadingIndicator(active = true)
                 moviesWithGenresWithSelected =
                     moviesWithGenresWithSelected?.loadData(moviesRepository.loadData())
             } catch (e: Exception) {
@@ -28,7 +28,7 @@ class MoviesPresenter(
             }
             withContext(Dispatchers.Main) {
                 if (message == "") {
-                    view.hideLoadView()
+                    view.setLoadingIndicator(active = false)
                     moviesWithGenresWithSelected?.let {
                         view.updateUI(it)
                     }
@@ -39,11 +39,11 @@ class MoviesPresenter(
         }
     }
 
-    fun clickMovie(id: Int) {
+    override fun clickMovie(id: Int) {
         view.moveMovieDetails(id)
     }
 
-    fun clickGenre(genre: String?) {
+    override fun clickGenre(genre: String?) {
         moviesWithGenresWithSelected?.let {
             moviesWithGenresWithSelected = it.setGenreSelected(genre)
         }
@@ -52,12 +52,12 @@ class MoviesPresenter(
         }
     }
 
-    fun setGenreSelected(genreSelected: String) {
+    override fun setGenreSelected(genreSelected: String) {
         moviesWithGenresWithSelected =
             moviesWithGenresWithSelected?.setGenreSelected(genreSelected)
     }
 
-    fun onSaveInstanceState(outState: Bundle) {
+    override fun onSaveInstanceState(outState: Bundle) {
         moviesWithGenresWithSelected?.genreSelected?.let {
             outState.putString(KEY_GENRE_SELECTED, it)
         }

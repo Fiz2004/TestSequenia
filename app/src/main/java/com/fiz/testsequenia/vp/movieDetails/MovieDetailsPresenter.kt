@@ -3,14 +3,17 @@ package com.fiz.testsequenia.vp.movieDetails
 import com.fiz.testsequenia.data.data_sources.remote.dto.MovieDto
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 
-class MovieDetailsPresenter(private val view: IMovieDetailsView, private val moviesRepository: MoviesRepository) {
+class MovieDetailsPresenter(
+    private val view: MovieDetailsContract.View,
+    private val moviesRepository: MoviesRepository
+) : MovieDetailsContract.Presenter {
     private var movie: MovieDto? = null
 
-    fun onCreateView(id: Int) {
+    override fun onCreateView(id: Int) {
         movie = moviesRepository.getSortMovies().first { id == it.id }
     }
 
-    fun onViewCreated() {
+    override fun onViewCreated() {
         movie?.let {
             view.onSetName(it.name)
             view.onSetYear(it.year)
@@ -19,9 +22,5 @@ class MovieDetailsPresenter(private val view: IMovieDetailsView, private val mov
             view.onSetLocalizedName(it.localizedName)
             view.onSetImage(it.imageUrl)
         }
-    }
-
-    fun clickBack() {
-        view.onClickBack()
     }
 }

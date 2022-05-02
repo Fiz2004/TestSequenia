@@ -12,7 +12,7 @@ import com.fiz.testsequenia.R
 import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
 
-class MovieDetailsFragment : Fragment(), IMovieDetailsView {
+class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
 
     private val moviesRepository by lazy {
         (requireActivity().application as App).appContainer.moviesRepository
