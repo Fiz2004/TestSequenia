@@ -48,11 +48,11 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(activity, 2)
 
+        moviesPresenter.loadMovies()
+
         binding.repeat.setOnClickListener {
             moviesPresenter.loadMovies()
         }
-
-        moviesPresenter.loadMovies()
     }
 
     override fun updateUI(

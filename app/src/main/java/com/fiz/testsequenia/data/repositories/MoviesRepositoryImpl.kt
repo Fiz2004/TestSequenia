@@ -11,7 +11,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class MoviesRepositoryImpl(
+class MoviesRepositoryImpl private constructor(
     private val moviesApi: MoviesApi,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : MoviesRepository {
@@ -24,9 +24,12 @@ class MoviesRepositoryImpl(
                 && (movies?.isEmpty() == true) || movies == null
             ) {
                 val response = moviesApi.fetchMovies()
-                val movies: List<MovieDto> = response.films
+                val movies: List<MovieDto> = response.films?.mapNotNull { it } ?: listOf()
 
-                genres = movies.flatMap { movie -> movie.genres }.distinct().map { it.toGenre() }
+                this@MoviesRepositoryImpl.genres =
+                    movies.flatMap { movie -> movie.genres?.mapNotNull { it } ?: listOf() }
+                        .distinct().map { it.toGenre() }
+
                 this@MoviesRepositoryImpl.movies =
                     movies.sortedBy { it.localizedName }.map { it.toMovie() }
             }

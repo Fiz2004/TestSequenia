@@ -4,13 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import coil.load
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
+import com.fiz.testsequenia.utils.loadUrl
 
 class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
 
@@ -42,20 +41,8 @@ class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
     }
 
     override fun onSetImage(url: String?) {
-        val imgUri = url?.toUri()?.buildUpon()?.scheme("https")?.build()
+        binding.imageUrl.loadUrl(url)
 
-        url?.let {
-            binding.imageUrl.load(imgUri) {
-                placeholder(R.drawable.ic_baseline_cloud_download_24)
-                error(R.drawable.ic_baseline_broken_image_24)
-            }
-        }
-        if (url == null) {
-            binding.imageUrl.load(R.drawable.ic_baseline_broken_image_24)
-            {
-                placeholder(R.drawable.ic_baseline_broken_image_24)
-            }
-        }
     }
 
     override fun onClickBack() {
