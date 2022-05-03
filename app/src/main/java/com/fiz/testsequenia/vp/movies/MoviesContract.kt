@@ -1,6 +1,5 @@
 package com.fiz.testsequenia.vp.movies
 
-import android.os.Bundle
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
 
@@ -14,18 +13,20 @@ interface MoviesContract {
 
         fun showError(message: String)
         fun setLoadingIndicator(active: Boolean)
+        fun clickMovie(id: Int)
+        fun clickGenre(genre: Genre)
     }
 
     interface Presenter {
 
+        var genreSelected: Genre?
+
         fun loadMovies()
+
+        fun cleanUp()
 
         fun clickMovie(id: Int)
 
         fun clickGenre(genre: Genre?)
-
-        fun setGenreSelected1(genreSelected: Genre)
-
-        fun onSaveInstanceState(outState: Bundle)
     }
 }

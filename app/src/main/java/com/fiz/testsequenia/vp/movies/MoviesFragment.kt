@@ -16,25 +16,25 @@ import com.fiz.testsequenia.domain.models.Movie
 
 class MoviesFragment : Fragment(), MoviesContract.View {
 
+    private var state: Parcelable? = null
+
     private val moviesRepository by lazy {
         (requireActivity().application as App).appContainer.moviesRepository
     }
 
-    private val moviesPresenter: MoviesPresenter by lazy {
+    private val moviesPresenter: MoviesContract.Presenter by lazy {
         MoviesPresenter(this, moviesRepository)
     }
 
     private val adapter: MoviesAdapter by lazy {
         MoviesAdapter(
             requireContext(),
-            moviesPresenter::clickMovie,
-            moviesPresenter::clickGenre
+            { id -> clickMovie(id) },
+            { genre -> clickGenre(genre) }
         )
     }
 
     private lateinit var binding: FragmentMoviesBinding
-
-    private var state: Parcelable? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +43,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
         val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
         if (genreSelected != null)
-            moviesPresenter.setGenreSelected1(Genre(name = genreSelected))
+            moviesPresenter.genreSelected = (Genre(name = genreSelected))
     }
 
     override fun onCreateView(
@@ -52,6 +52,11 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     ): View {
         binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        moviesPresenter.cleanUp()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -80,6 +85,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         (manager as? GridLayoutManager)?.spanSizeLookup =
             spanSizeLookup(genres.size)
 
+        binding.moviesRecyclerView.visibility = View.VISIBLE
         binding.moviesRecyclerView.layoutManager = manager
         binding.moviesRecyclerView.adapter = adapter
 
@@ -99,7 +105,9 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     override fun showError(message: String) {
         binding.circularProgressIndicator.visibility = View.GONE
         binding.repeat.visibility = View.VISIBLE
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        binding.moviesRecyclerView.visibility = View.GONE
+        if (context != null)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     private fun spanSizeLookup(countGenres: Int) =
@@ -111,6 +119,14 @@ class MoviesFragment : Fragment(), MoviesContract.View {
             }
         }
 
+    override fun clickMovie(id: Int) {
+        moviesPresenter.clickMovie(id)
+    }
+
+    override fun clickGenre(genre: Genre) {
+        moviesPresenter.clickGenre(genre)
+    }
+
     override fun moveMovieDetails(id: Int) {
         val action = MoviesFragmentDirections.actionMoviesFragmentToMovieDetailsFragment(id)
         findNavController().navigate(action)
@@ -121,7 +137,10 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         if (this::binding.isInitialized)
             state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         outState.putParcelable(RECYCLER_VIEW_STATE, state)
-        moviesPresenter.onSaveInstanceState(outState)
+
+        moviesPresenter.genreSelected?.let {
+            outState.putString(MoviesPresenter.KEY_GENRE_SELECTED, it.name)
+        }
     }
 
     companion object {
