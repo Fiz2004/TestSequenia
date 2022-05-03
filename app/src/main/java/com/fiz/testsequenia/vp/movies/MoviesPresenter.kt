@@ -1,10 +1,10 @@
 package com.fiz.testsequenia.vp.movies
 
 import com.fiz.testsequenia.data.data_sources.remote.dto.toGenre
-import com.fiz.testsequenia.data.repositories.Resource
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
+import com.fiz.testsequenia.utils.Resource
 import kotlinx.coroutines.*
 
 class MoviesPresenter(

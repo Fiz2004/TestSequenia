@@ -4,14 +4,10 @@ import com.fiz.testsequenia.data.data_sources.remote.MoviesApi
 import com.fiz.testsequenia.data.data_sources.remote.dto.toMovie
 import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
+import com.fiz.testsequenia.utils.Resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-
-sealed class Resource<T>(val data: T? = null, val message: String? = null) {
-    class Success<T>(data: T?) : Resource<T>(data)
-    class Error<T>(message: String, data: T? = null) : Resource<T>(data, message)
-}
 
 
 class MoviesRepositoryImpl private constructor(
