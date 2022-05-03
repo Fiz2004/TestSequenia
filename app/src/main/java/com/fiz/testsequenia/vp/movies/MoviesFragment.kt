@@ -34,6 +34,17 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
     private lateinit var binding: FragmentMoviesBinding
 
+    private var state: Parcelable? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        state = savedInstanceState?.getParcelable(RECYCLER_VIEW_STATE)
+
+        val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
+        if (genreSelected != null)
+            moviesPresenter.setGenreSelected1(Genre(name = genreSelected))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,6 +56,9 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (state != null)
+            binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
 
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(activity, 2)
 
@@ -102,21 +116,10 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         findNavController().navigate(action)
     }
 
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-
-        val state: Parcelable? = savedInstanceState?.getParcelable(RECYCLER_VIEW_STATE)
-        if (state != null)
-            binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
-
-        val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
-        if (genreSelected != null)
-            moviesPresenter.setGenreSelected1(Genre(name = genreSelected))
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
+        if (this::binding.isInitialized)
+            state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         outState.putParcelable(RECYCLER_VIEW_STATE, state)
         moviesPresenter.onSaveInstanceState(outState)
     }
