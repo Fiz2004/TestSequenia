@@ -9,6 +9,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.fiz.testsequenia.R
 
 class MainActivity : AppCompatActivity() {
+    private var navHostFragment: NavHostFragment? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -21,5 +22,10 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Toolbar>(R.id.appBarLayout)
             .setupWithNavController(navController, appBarConfiguration)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        navHostFragment = null
     }
 }
