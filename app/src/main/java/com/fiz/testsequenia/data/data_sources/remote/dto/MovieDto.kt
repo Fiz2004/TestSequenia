@@ -18,12 +18,12 @@ data class MovieDto(
 fun MovieDto.toMovie(): Movie {
     return Movie(
         id = id ?: 0,
-        localizedName = localizedName ?: "",
-        name = name ?: "",
+        localizedName = localizedName.orEmpty(),
+        name = name.orEmpty(),
         year = year ?: 0,
         rating = rating,
         imageUrl = imageUrl,
-        description = description ?: "",
+        description = description.orEmpty(),
         genres = genres?.mapNotNull { it } ?: listOf()
     )
 }
