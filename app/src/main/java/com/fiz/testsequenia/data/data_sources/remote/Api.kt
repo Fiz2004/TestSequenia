@@ -5,8 +5,7 @@ import retrofit2.http.GET
 
 interface MoviesApi {
     @GET("sequeniatesttask/films.json")
-    suspend fun fetchMovies():
-            MoviesDto
+    suspend fun fetchMovies(): MoviesDto
 
     companion object {
         const val BASE_URL =
