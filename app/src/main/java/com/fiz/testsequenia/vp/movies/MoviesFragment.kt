@@ -34,23 +34,23 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         )
     }
 
-    private lateinit var binding: FragmentMoviesBinding
+    private var _binding: FragmentMoviesBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         state = savedInstanceState?.getParcelable(RECYCLER_VIEW_STATE)
 
-        val genreSelected = savedInstanceState?.getString(MoviesPresenter.KEY_GENRE_SELECTED)
-        if (genreSelected != null)
-            moviesPresenter.genreSelected = (Genre(name = genreSelected))
+        val genreSelected = savedInstanceState?.getString(KEY_GENRE_SELECTED)
+        moviesPresenter.loadGenreSelected(genreSelected)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMoviesBinding.inflate(inflater, container, false)
+        _binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -134,16 +134,22 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        if (this::binding.isInitialized)
+        if (_binding != null)
             state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         outState.putParcelable(RECYCLER_VIEW_STATE, state)
 
-        moviesPresenter.genreSelected?.let {
-            outState.putString(MoviesPresenter.KEY_GENRE_SELECTED, it.name)
+        moviesPresenter.getGenreSelected()?.let {
+            outState.putString(KEY_GENRE_SELECTED, it)
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
     companion object {
+        const val KEY_GENRE_SELECTED = "genre"
         const val RECYCLER_VIEW_STATE = "RECYCLER_VIEW_STATE"
     }
 }

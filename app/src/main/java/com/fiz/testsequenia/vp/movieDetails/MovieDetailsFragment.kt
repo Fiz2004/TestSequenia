@@ -22,13 +22,14 @@ class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
         MovieDetailsPresenter(this, moviesRepository)
     }
 
-    private lateinit var binding: FragmentMovieDetailsBinding
+    private var _binding: FragmentMovieDetailsBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
+        _binding = FragmentMovieDetailsBinding.inflate(inflater, container, false)
 
         val args = MovieDetailsFragmentArgs.fromBundle(requireArguments())
         movieDetailsPresenter.start(args.id)
@@ -69,5 +70,10 @@ class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
 
     override fun onClickBack() {
         findNavController().popBackStack()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

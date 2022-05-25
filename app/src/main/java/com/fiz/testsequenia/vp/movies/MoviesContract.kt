@@ -21,6 +21,10 @@ interface MoviesContract {
 
         var genreSelected: Genre?
 
+        fun loadGenreSelected(genreSelected: String?)
+
+        fun getGenreSelected(): String?
+
         fun loadMovies()
 
         fun cleanUp()

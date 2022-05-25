@@ -14,6 +14,8 @@ class MoviesPresenter(
     private var genres: List<Genre> = listOf()
     private var movies: List<Movie> = listOf()
 
+    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+
     override var genreSelected: Genre? = null
         set(value) {
             field = if (value == genreSelected) {
@@ -23,31 +25,39 @@ class MoviesPresenter(
             }
         }
 
-    private val scope = CoroutineScope(Job() + Dispatchers.Main)
+    override fun loadGenreSelected(genreSelected: String?) {
+        val genreName = genreSelected ?: return
+        val genre = Genre(name = genreName)
+        this.genreSelected = genre
+    }
+
+    override fun getGenreSelected(): String? {
+        return genreSelected?.name
+    }
 
     override fun loadMovies() {
         scope.launch {
             view.setLoadingIndicator(active = true)
-            val resultLoad = try {
-                moviesRepository.loadData()
-            } catch (e: Exception) {
-                Resource.Error("Network request failed")
-            }
-            when (resultLoad) {
+
+            when (val resultLoad = moviesRepository.loadData()) {
                 is Resource.Success -> {
-                    val movies = resultLoad.data ?: listOf()
-                    this@MoviesPresenter.movies = movies.sortedBy { it.localizedName }
-                    this@MoviesPresenter.genres =
-                        movies.flatMap { movie -> movie.genres.map { it } }
-                            .distinct().map { it.toGenre() }
+                    setupData(resultLoad.data)
                     view.setLoadingIndicator(active = false)
                     view.updateUI(this@MoviesPresenter.movies, genres, genreSelected)
                 }
                 else -> {
-                    view.showError(resultLoad.message!!)
+                    view.showError(resultLoad.message ?: "Network request failed")
                 }
             }
         }
+    }
+
+    private fun setupData(data: List<Movie>?) {
+        val movies = data ?: listOf()
+        this@MoviesPresenter.movies = movies.sortedBy { it.localizedName }
+        this@MoviesPresenter.genres =
+            movies.flatMap { movie -> movie.genres.map { it } }
+                .distinct().map { it.toGenre() }
     }
 
     override fun cleanUp() {
@@ -63,9 +73,5 @@ class MoviesPresenter(
             genreSelected = it
         }
         view.updateUI(movies, genres, genreSelected)
-    }
-
-    companion object {
-        const val KEY_GENRE_SELECTED = "genre"
     }
 }

@@ -16,15 +16,13 @@ class MoviesRepositoryImpl private constructor(
 ) : MoviesRepository {
     override var movies: List<Movie>? = null; private set
 
-    override suspend fun loadData(): Resource<List<Movie>?> {
-        return try {
-            withContext(dispatcher) {
-                if ((movies?.isEmpty() == true) || movies == null) {
-                    val response = moviesApi.fetchMovies()
-                    movies = response.films?.mapNotNull { it }?.map { it.toMovie() } ?: listOf()
-                }
-                Resource.Success(movies)
+    override suspend fun loadData(): Resource<List<Movie>?> = withContext(dispatcher) {
+        try {
+            if ((movies?.isEmpty() == true) || movies == null) {
+                val response = moviesApi.fetchMovies()
+                movies = response.films?.mapNotNull { it }?.map { it.toMovie() } ?: listOf()
             }
+            Resource.Success(movies)
         } catch (e: Exception) {
             Resource.Error(e.message.toString())
         }
