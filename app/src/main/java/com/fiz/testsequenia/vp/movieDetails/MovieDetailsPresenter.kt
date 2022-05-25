@@ -5,7 +5,7 @@ import com.fiz.testsequenia.domain.repositories.MoviesRepository
 
 class MovieDetailsPresenter(
     private val view: MovieDetailsContract.View,
-    private val moviesRepository: MoviesRepository
+    private val moviesRepository: MoviesRepository,
 ) : MovieDetailsContract.Presenter {
     private var movie: Movie? = null
 

@@ -7,5 +7,7 @@
     <string name="image_movie">Изображение фильма</string>
     <string name="main">Главная</string>
     <string name="repeatButton">Повторить запрос</string>
+    <string name="networkErrorCashEnabled">Сетевой запрос закончился ошибкой, Загружены данные из кэша</string>
+    <string name="networkErrorCashDisabled">Сетевой запрос закончился ошибкой</string>
 
 </resources>
