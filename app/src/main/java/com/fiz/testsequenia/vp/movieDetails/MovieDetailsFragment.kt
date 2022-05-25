@@ -8,15 +8,17 @@ import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.fiz.testsequenia.R
-import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMovieDetailsBinding
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import com.fiz.testsequenia.utils.loadUrl
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
 
-    private val moviesRepository by lazy {
-        (requireActivity().application as App).appContainer.moviesRepository
-    }
+    @Inject
+    lateinit var moviesRepository: MoviesRepository
 
     private val movieDetailsPresenter: MovieDetailsPresenter by lazy {
         MovieDetailsPresenter(this, moviesRepository)

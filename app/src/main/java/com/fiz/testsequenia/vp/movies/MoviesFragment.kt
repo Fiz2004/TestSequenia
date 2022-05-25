@@ -9,18 +9,20 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.fiz.testsequenia.app.App
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
+import com.fiz.testsequenia.domain.repositories.MoviesRepository
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MoviesFragment : Fragment(), MoviesContract.View {
 
     private var state: Parcelable? = null
 
-    private val moviesRepository by lazy {
-        (requireActivity().application as App).appContainer.moviesRepository
-    }
+    @Inject
+    lateinit var moviesRepository: MoviesRepository
 
     private val moviesPresenter: MoviesContract.Presenter by lazy {
         MoviesPresenter(this, moviesRepository)

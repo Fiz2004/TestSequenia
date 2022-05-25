@@ -8,9 +8,9 @@ import com.fiz.testsequenia.utils.Resource
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-
-class MoviesRepositoryImpl private constructor(
+class MoviesRepositoryImpl @Inject constructor(
     private val moviesApi: MoviesApi,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : MoviesRepository {
@@ -25,20 +25,6 @@ class MoviesRepositoryImpl private constructor(
             Resource.Success(movies)
         } catch (e: Exception) {
             Resource.Error(e.message.toString())
-        }
-    }
-
-    companion object {
-        private var INSTANCE: MoviesRepositoryImpl? = null
-        fun initialize(moviesApi: MoviesApi) {
-            if (INSTANCE == null) {
-                INSTANCE = MoviesRepositoryImpl(moviesApi)
-            }
-        }
-
-        fun get(): MoviesRepositoryImpl {
-            return INSTANCE
-                ?: throw IllegalStateException("MoviesRepository must be initialized")
         }
     }
 }
