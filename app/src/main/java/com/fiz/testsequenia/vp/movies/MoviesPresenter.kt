@@ -9,11 +9,11 @@ import com.fiz.testsequenia.vp.models.DataItem
 import kotlinx.coroutines.*
 
 class MoviesPresenter(
-    private val textGenre: String,
-    private val textMovie: String,
     private val view: MoviesContract.View,
     private val moviesRepository: MoviesRepository,
-    private val scope: CoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
+    private val scope: CoroutineScope = CoroutineScope(Job() + Dispatchers.Main),
+    private val textGenre: String = "",
+    private val textMovie: String = "",
 ) : MoviesContract.Presenter {
 
     private var genres: List<Genre> = listOf()
@@ -40,10 +40,10 @@ class MoviesPresenter(
 
     override fun loadMovies() {
         scope.launch {
-            view.setStateLoading(active = true)
+            view.setStateLoading(value = true)
             val resultLoad = moviesRepository.loadData()
             resultLoad.data?.let { setupData(it) }
-            view.setStateLoading(active = false)
+            view.setStateLoading(value = false)
 
             when (resultLoad) {
                 is Resource.Success -> view.setStateShowMovies(

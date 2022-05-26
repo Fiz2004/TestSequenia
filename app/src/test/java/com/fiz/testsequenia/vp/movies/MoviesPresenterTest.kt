@@ -1,11 +1,13 @@
 package com.fiz.testsequenia.vp.movies
 
 import com.fiz.testsequenia.data.repositories.MoviesRepositoryImpl
+import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.utils.Resource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
@@ -106,7 +108,7 @@ class MoviesPresenterTest {
             launch(Dispatchers.Main) {
                 moviesPresenter.loadMovies()
 
-                verify(view, times(1)).setStateShowMovies(any(), any(), anyOrNull())
+                verify(view, times(1)).setStateShowMovies(anyOrNull())
             }
         }
     }
@@ -124,8 +126,6 @@ class MoviesPresenterTest {
                 moviesPresenter.loadMovies()
 
                 verify(view, times(1)).setStateShowLocalMovies(
-                    any(),
-                    any(),
                     anyOrNull(),
                     anyOrNull()
                 )
@@ -160,6 +160,36 @@ class MoviesPresenterTest {
 
     @Test
     fun whenClickGenre_shouldInformViewSetNewState() {
+        val selectedGenre = Genre("Выбранный жанр")
+        moviesPresenter.clickGenre(selectedGenre)
 
+        verify(view, times(1)).setStateShowMovies(any())
+    }
+
+    @Test
+    fun whenClickGenre_shouldSetGenreSelect() {
+        val selectedGenre = Genre("Выбранный жанр")
+        moviesPresenter.clickGenre(selectedGenre)
+
+        Assert.assertEquals(selectedGenre, moviesPresenter.genreSelected)
+    }
+
+    @Test
+    fun whenClickGenreRepeat_shouldUnSelectedGenreSelect() {
+        val selectedGenre = Genre("Выбранный жанр")
+        moviesPresenter.clickGenre(selectedGenre)
+        moviesPresenter.clickGenre(selectedGenre)
+
+        Assert.assertNull(moviesPresenter.genreSelected)
+    }
+
+    @Test
+    fun whenClickGenreAnother_shouldSetGenreSelect() {
+        val firstSelectedGenre = Genre("Выбранный жанр")
+        val secondSelectedGenre = Genre("Новый выбранный жанр")
+        moviesPresenter.clickGenre(firstSelectedGenre)
+        moviesPresenter.clickGenre(secondSelectedGenre)
+
+        Assert.assertEquals(secondSelectedGenre, moviesPresenter.genreSelected)
     }
 }

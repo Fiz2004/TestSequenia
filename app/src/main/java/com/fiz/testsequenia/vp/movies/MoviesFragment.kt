@@ -28,7 +28,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     private val moviesPresenter: MoviesContract.Presenter by lazy {
         val textGenre = resources.getString(R.string.genres)
         val textMovie = resources.getString(R.string.movies)
-        MoviesPresenter(textGenre, textMovie, this, moviesRepository)
+        MoviesPresenter(this, moviesRepository, textGenre = textGenre, textMovie = textMovie)
     }
 
     private val adapter: MoviesAdapter by lazy {

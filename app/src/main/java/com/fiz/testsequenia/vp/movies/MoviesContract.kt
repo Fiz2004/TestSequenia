@@ -8,7 +8,7 @@ interface MoviesContract {
     interface View {
         fun moveMovieDetails(id: Int)
 
-        fun setStateLoading(active: Boolean)
+        fun setStateLoading(value: Boolean)
         fun setStateShowMovies(dataItem: List<DataItem>)
         fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?)
 
