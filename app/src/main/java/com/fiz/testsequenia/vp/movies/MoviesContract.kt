@@ -14,10 +14,10 @@ interface MoviesContract {
             movies: List<Movie>,
             genres: List<Genre>,
             genreSelected: Genre?,
-            message: String
+            message: String?
         )
 
-        fun setStateFullError(message: String)
+        fun setStateFullError(message: String?)
 
         fun clickMovie(id: Int)
         fun clickGenre(genre: Genre)

@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
+import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
@@ -110,21 +111,29 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         movies: List<Movie>,
         genres: List<Genre>,
         genreSelected: Genre?,
-        message: String
+        message: String?
     ) {
         binding.repeat.visibility = View.GONE
 
         setStateShowMovies(movies, genres, genreSelected)
 
         if (context != null)
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                context,
+                message ?: getString(R.string.networkErrorCashEnabled),
+                Toast.LENGTH_LONG
+            ).show()
     }
 
-    override fun setStateFullError(message: String) {
+    override fun setStateFullError(message: String?) {
         binding.repeat.visibility = View.VISIBLE
         binding.moviesRecyclerView.visibility = View.GONE
         if (context != null)
-            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                context,
+                message ?: getString(R.string.networkErrorCashDisabled),
+                Toast.LENGTH_LONG
+            ).show()
     }
 
     private fun spanSizeLookup(countGenres: Int) =

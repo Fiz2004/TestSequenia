@@ -71,9 +71,6 @@ class MoviesPresenterTest {
 
                 verify(view, times(1)).setStateLoading(true)
             }
-
-            runCurrent()
-            advanceUntilIdle()
         }
     }
 
@@ -93,6 +90,62 @@ class MoviesPresenterTest {
                     verify(view, times(1)).setStateLoading(true)
                     verify(view, times(1)).setStateLoading(false)
                 }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenLoadData_ReturnSuccess_shouldSetStateShowMovies() {
+
+        moviesRepository.stub {
+            onBlocking { loadData() }.doReturn(Resource.Success(listOf<Movie>()))
+        }
+
+        runTest {
+            launch(Dispatchers.Main) {
+                moviesPresenter.loadMovies()
+
+                verify(view, times(1)).setStateShowMovies(any(), any(), anyOrNull())
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenLoadData_ReturnSuccessLocal_shouldSetStateShowMovies() {
+
+        moviesRepository.stub {
+            onBlocking { loadData() }.doReturn(Resource.SuccessOnlyLocal(listOf<Movie>()))
+        }
+
+        runTest {
+            launch(Dispatchers.Main) {
+                moviesPresenter.loadMovies()
+
+                verify(view, times(1)).setStateShowLocalMovies(
+                    any(),
+                    any(),
+                    anyOrNull(),
+                    anyOrNull()
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun whenLoadData_ReturnError_shouldSetStateFullError() {
+
+        moviesRepository.stub {
+            onBlocking { loadData() }.doReturn(Resource.Error("network"))
+        }
+
+        runTest {
+            launch(Dispatchers.Main) {
+                moviesPresenter.loadMovies()
+
+                verify(view, times(1)).setStateFullError("network")
             }
         }
     }

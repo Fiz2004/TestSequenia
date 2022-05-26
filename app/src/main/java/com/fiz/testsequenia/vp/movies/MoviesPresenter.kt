@@ -52,11 +52,11 @@ class MoviesPresenter(
                     this@MoviesPresenter.movies,
                     genres,
                     genreSelected,
-                    resultLoad.message ?: "Network request failed, Сashed  data loaded"
+                    resultLoad.message
                 )
 
                 is Resource.Error -> view.setStateFullError(
-                    resultLoad.message ?: "Network request failed"
+                    resultLoad.message
                 )
             }
         }
