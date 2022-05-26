@@ -48,19 +48,23 @@ class MoviesPresenterTest {
     }
 
     @Test
-    fun getGenreSelected() {
+    fun whenLoadGenreSelectedNull_shouldNothingDo() {
+        Assert.assertNull(moviesPresenter.genreSelected)
+
+        moviesPresenter.loadGenreSelected(null)
+
+        Assert.assertNull(moviesPresenter.genreSelected)
     }
 
     @Test
-    fun setGenreSelected() {
-    }
+    fun whenLoadGenreSelected_shouldSetGenreSelected() {
+        Assert.assertNull(moviesPresenter.genreSelected)
 
-    @Test
-    fun loadGenreSelected() {
-    }
+        val loadGenre = "Загруженный жанр"
+        moviesPresenter.loadGenreSelected(loadGenre)
 
-    @Test
-    fun testGetGenreSelectedName() {
+        Assert.assertEquals(loadGenre, moviesPresenter.genreSelected?.name)
+
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
