@@ -14,6 +14,7 @@ import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
+import com.fiz.testsequenia.vp.models.DataItem
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -31,7 +32,6 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
     private val adapter: MoviesAdapter by lazy {
         MoviesAdapter(
-            requireContext(),
             { id -> clickMovie(id) },
             { genre -> clickGenre(genre) }
         )
@@ -55,11 +55,6 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     ): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        moviesPresenter.cleanUp()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,7 +89,17 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     ) {
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
 
-        adapter.refreshData(movies, genres, genreSelected)
+        val textGenre = resources.getString(R.string.genres)
+        val textMovie = resources.getString(R.string.movies)
+        adapter.submitList(
+            DataItem.getDataItemFromDomain(
+                textGenre,
+                textMovie,
+                movies,
+                genres,
+                genreSelected
+            )
+        )
 
         val manager = binding.moviesRecyclerView.layoutManager
         (manager as? GridLayoutManager)?.spanSizeLookup =
@@ -164,7 +169,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
             state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
         outState.putParcelable(RECYCLER_VIEW_STATE, state)
 
-        moviesPresenter.getGenreSelected()?.let {
+        moviesPresenter.getGenreSelectedName()?.let {
             outState.putString(KEY_GENRE_SELECTED, it)
         }
     }
@@ -172,6 +177,11 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        moviesPresenter.cleanUp()
     }
 
     companion object {

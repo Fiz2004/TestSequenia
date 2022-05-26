@@ -30,7 +30,7 @@ class MoviesPresenter(
         this.genreSelected = genre
     }
 
-    override fun getGenreSelected(): String? {
+    override fun getGenreSelectedName(): String? {
         return genreSelected?.name
     }
 

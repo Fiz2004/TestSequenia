@@ -29,7 +29,7 @@ interface MoviesContract {
 
         fun loadGenreSelected(genreSelected: String?)
 
-        fun getGenreSelected(): String?
+        fun getGenreSelectedName(): String?
 
         fun loadMovies()
 

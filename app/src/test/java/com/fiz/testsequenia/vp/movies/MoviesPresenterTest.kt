@@ -58,7 +58,7 @@ class MoviesPresenterTest {
     }
 
     @Test
-    fun testGetGenreSelected() {
+    fun testGetGenreSelectedName() {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -151,14 +151,15 @@ class MoviesPresenterTest {
     }
 
     @Test
-    fun cleanUp() {
+    fun whenClickMovie_shouldInformViewMoveMovieDetailsByID() {
+        val id = 0
+        moviesPresenter.clickMovie(id)
+
+        verify(view, times(1)).moveMovieDetails(id)
     }
 
     @Test
-    fun clickMovie() {
-    }
+    fun whenClickGenre_shouldInformViewSetNewState() {
 
-    @Test
-    fun clickGenre() {
     }
 }
