@@ -7,13 +7,18 @@ interface MoviesContract {
 
     interface View {
         fun moveMovieDetails(id: Int)
-        fun updateUI(
-            movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?
+
+        fun setStateLoading(active: Boolean)
+        fun setStateShowMovies(movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?)
+        fun setStateShowLocalMovies(
+            movies: List<Movie>,
+            genres: List<Genre>,
+            genreSelected: Genre?,
+            message: String
         )
 
-        fun showFullError(message: String)
-        fun showError(message: String)
-        fun setLoadingIndicator(active: Boolean)
+        fun setStateFullError(message: String)
+
         fun clickMovie(id: Int)
         fun clickGenre(genre: Genre)
     }

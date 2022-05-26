@@ -76,8 +76,20 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         }
     }
 
-    override fun updateUI(
-        movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?
+    override fun setStateLoading(active: Boolean) {
+        val visibility = if (active)
+            View.VISIBLE
+        else
+            View.GONE
+
+        binding.circularProgressIndicator.visibility = visibility
+        binding.repeat.visibility = View.GONE
+    }
+
+    override fun setStateShowMovies(
+        movies: List<Movie>,
+        genres: List<Genre>,
+        genreSelected: Genre?
     ) {
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
 
@@ -94,23 +106,21 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
     }
 
-    override fun setLoadingIndicator(active: Boolean) {
-        val visibility = if (active)
-            View.VISIBLE
-        else
-            View.GONE
-
-        binding.circularProgressIndicator.visibility = visibility
+    override fun setStateShowLocalMovies(
+        movies: List<Movie>,
+        genres: List<Genre>,
+        genreSelected: Genre?,
+        message: String
+    ) {
         binding.repeat.visibility = View.GONE
-    }
 
-    override fun showError(message: String) {
+        setStateShowMovies(movies, genres, genreSelected)
+
         if (context != null)
             Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun showFullError(message: String) {
-        binding.circularProgressIndicator.visibility = View.GONE
+    override fun setStateFullError(message: String) {
         binding.repeat.visibility = View.VISIBLE
         binding.moviesRecyclerView.visibility = View.GONE
         if (context != null)
