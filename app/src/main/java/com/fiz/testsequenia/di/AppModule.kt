@@ -1,5 +1,8 @@
 package com.fiz.testsequenia.di
 
+import android.app.Application
+import androidx.room.Room
+import com.fiz.testsequenia.data.data_sources.local.MovieDatabase
 import com.fiz.testsequenia.data.data_sources.remote.MoviesApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -38,5 +41,15 @@ class AppModule {
     @Provides
     fun provideCoroutineDispatcher(): CoroutineDispatcher {
         return Dispatchers.Default
+    }
+
+    @Provides
+    @Singleton
+    fun provideMovieDatabase(app: Application): MovieDatabase {
+        return Room.databaseBuilder(
+            app,
+            MovieDatabase::class.java,
+            "moviedb.db"
+        ).build()
     }
 }

@@ -105,6 +105,11 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     }
 
     override fun showError(message: String) {
+        if (context != null)
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun showFullError(message: String) {
         binding.circularProgressIndicator.visibility = View.GONE
         binding.repeat.visibility = View.VISIBLE
         binding.moviesRecyclerView.visibility = View.GONE

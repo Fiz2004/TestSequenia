@@ -11,6 +11,7 @@ interface MoviesContract {
             movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?
         )
 
+        fun showFullError(message: String)
         fun showError(message: String)
         fun setLoadingIndicator(active: Boolean)
         fun clickMovie(id: Int)

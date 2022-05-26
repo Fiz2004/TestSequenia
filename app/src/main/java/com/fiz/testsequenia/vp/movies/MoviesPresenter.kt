@@ -40,13 +40,18 @@ class MoviesPresenter(
             view.setLoadingIndicator(active = true)
 
             when (val resultLoad = moviesRepository.loadData()) {
-                is Resource.Success -> {
+                is Resource.Success,
+                is Resource.SuccessOnlyLocal -> {
                     setupData(resultLoad.data)
                     view.setLoadingIndicator(active = false)
                     view.updateUI(this@MoviesPresenter.movies, genres, genreSelected)
+                    if (resultLoad is Resource.SuccessOnlyLocal)
+                        view.showError(
+                            resultLoad.message ?: "Network request failed, Сashed  data loaded"
+                        )
                 }
                 else -> {
-                    view.showError(resultLoad.message ?: "Network request failed")
+                    view.showFullError(resultLoad.message ?: "Network request failed")
                 }
             }
         }
@@ -57,7 +62,7 @@ class MoviesPresenter(
         this@MoviesPresenter.movies = movies.sortedBy { it.localizedName }
         this@MoviesPresenter.genres =
             movies.flatMap { movie -> movie.genres.map { it } }
-                .distinct().map { it.toGenre() }
+                .distinct().filterNot { it == "" }.map { it.toGenre() }
     }
 
     override fun cleanUp() {
