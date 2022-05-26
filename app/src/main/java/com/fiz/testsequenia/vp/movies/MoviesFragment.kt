@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.fiz.testsequenia.R
 import com.fiz.testsequenia.databinding.FragmentMoviesBinding
 import com.fiz.testsequenia.domain.models.Genre
-import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import com.fiz.testsequenia.vp.models.DataItem
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +26,9 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     lateinit var moviesRepository: MoviesRepository
 
     private val moviesPresenter: MoviesContract.Presenter by lazy {
-        MoviesPresenter(this, moviesRepository)
+        val textGenre = resources.getString(R.string.genres)
+        val textMovie = resources.getString(R.string.movies)
+        MoviesPresenter(textGenre, textMovie, this, moviesRepository)
     }
 
     private val adapter: MoviesAdapter by lazy {
@@ -72,8 +73,8 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         }
     }
 
-    override fun setStateLoading(active: Boolean) {
-        val visibility = if (active)
+    override fun setStateLoading(value: Boolean) {
+        val visibility = if (value)
             View.VISIBLE
         else
             View.GONE
@@ -82,28 +83,14 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         binding.repeat.visibility = View.GONE
     }
 
-    override fun setStateShowMovies(
-        movies: List<Movie>,
-        genres: List<Genre>,
-        genreSelected: Genre?
-    ) {
+    override fun setStateShowMovies(dataItem: List<DataItem>) {
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
 
-        val textGenre = resources.getString(R.string.genres)
-        val textMovie = resources.getString(R.string.movies)
-        adapter.submitList(
-            DataItem.getDataItemFromDomain(
-                textGenre,
-                textMovie,
-                movies,
-                genres,
-                genreSelected
-            )
-        )
+        adapter.submitList(dataItem)
 
         val manager = binding.moviesRecyclerView.layoutManager
         (manager as? GridLayoutManager)?.spanSizeLookup =
-            spanSizeLookup(genres.size)
+            spanSizeLookup(dataItem)
 
         binding.moviesRecyclerView.visibility = View.VISIBLE
         binding.moviesRecyclerView.layoutManager = manager
@@ -112,15 +99,10 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
     }
 
-    override fun setStateShowLocalMovies(
-        movies: List<Movie>,
-        genres: List<Genre>,
-        genreSelected: Genre?,
-        message: String?
-    ) {
+    override fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?) {
         binding.repeat.visibility = View.GONE
 
-        setStateShowMovies(movies, genres, genreSelected)
+        setStateShowMovies(dataItem)
 
         if (context != null)
             Toast.makeText(
@@ -141,13 +123,10 @@ class MoviesFragment : Fragment(), MoviesContract.View {
             ).show()
     }
 
-    private fun spanSizeLookup(countGenres: Int) =
+    private fun spanSizeLookup(dataItem: List<DataItem>) =
         object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int) = when (position) {
-                0, countGenres + 1 -> 2
-                in 1..countGenres -> 2
-                else -> 1
-            }
+            override fun getSpanSize(position: Int) =
+                moviesPresenter.getSpanSize(dataItem, position)
         }
 
     override fun clickMovie(id: Int) {

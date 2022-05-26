@@ -1,7 +1,7 @@
 package com.fiz.testsequenia.vp.movies
 
 import com.fiz.testsequenia.domain.models.Genre
-import com.fiz.testsequenia.domain.models.Movie
+import com.fiz.testsequenia.vp.models.DataItem
 
 interface MoviesContract {
 
@@ -9,13 +9,8 @@ interface MoviesContract {
         fun moveMovieDetails(id: Int)
 
         fun setStateLoading(active: Boolean)
-        fun setStateShowMovies(movies: List<Movie>, genres: List<Genre>, genreSelected: Genre?)
-        fun setStateShowLocalMovies(
-            movies: List<Movie>,
-            genres: List<Genre>,
-            genreSelected: Genre?,
-            message: String?
-        )
+        fun setStateShowMovies(dataItem: List<DataItem>)
+        fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?)
 
         fun setStateFullError(message: String?)
 
@@ -24,8 +19,6 @@ interface MoviesContract {
     }
 
     interface Presenter {
-
-        var genreSelected: Genre?
 
         fun loadGenreSelected(genreSelected: String?)
 
@@ -38,5 +31,7 @@ interface MoviesContract {
         fun clickMovie(id: Int)
 
         fun clickGenre(genre: Genre?)
+
+        fun getSpanSize(dataItem: List<DataItem>, position: Int): Int
     }
 }

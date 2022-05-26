@@ -5,17 +5,21 @@ import com.fiz.testsequenia.domain.models.Genre
 import com.fiz.testsequenia.domain.models.Movie
 import com.fiz.testsequenia.domain.repositories.MoviesRepository
 import com.fiz.testsequenia.utils.Resource
+import com.fiz.testsequenia.vp.models.DataItem
 import kotlinx.coroutines.*
 
 class MoviesPresenter(
+    private val textGenre: String,
+    private val textMovie: String,
     private val view: MoviesContract.View,
     private val moviesRepository: MoviesRepository,
     private val scope: CoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
 ) : MoviesContract.Presenter {
+
     private var genres: List<Genre> = listOf()
     private var movies: List<Movie> = listOf()
 
-    override var genreSelected: Genre? = null
+    var genreSelected: Genre? = null
         set(value) {
             field = if (value == genreSelected) {
                 null
@@ -43,15 +47,19 @@ class MoviesPresenter(
 
             when (resultLoad) {
                 is Resource.Success -> view.setStateShowMovies(
-                    this@MoviesPresenter.movies,
-                    genres,
-                    genreSelected
+                    getListDataItem(
+                        this@MoviesPresenter.movies,
+                        genres,
+                        genreSelected
+                    )
                 )
 
                 is Resource.SuccessOnlyLocal -> view.setStateShowLocalMovies(
-                    this@MoviesPresenter.movies,
-                    genres,
-                    genreSelected,
+                    getListDataItem(
+                        this@MoviesPresenter.movies,
+                        genres,
+                        genreSelected
+                    ),
                     resultLoad.message
                 )
 
@@ -60,6 +68,20 @@ class MoviesPresenter(
                 )
             }
         }
+    }
+
+    private fun getListDataItem(
+        movies: List<Movie>,
+        genres: List<Genre>,
+        genreSelected: Genre?
+    ): List<DataItem> {
+        return DataItem.getDataItemFromDomain(
+            textGenre,
+            textMovie,
+            movies,
+            genres,
+            genreSelected
+        )
     }
 
     private fun setupData(data: List<Movie>?) {
@@ -82,6 +104,15 @@ class MoviesPresenter(
         genre?.let {
             genreSelected = it
         }
-        view.setStateShowMovies(movies, genres, genreSelected)
+        view.setStateShowMovies(getListDataItem(movies, genres, genreSelected))
+    }
+
+    override fun getSpanSize(dataItem: List<DataItem>, position: Int): Int {
+        val countMovies = dataItem.filterIsInstance<DataItem.MovieItem>().size
+        val countTwoSize = dataItem.size - countMovies
+        return when (position) {
+            in 0 until countTwoSize -> 2
+            else -> 1
+        }
     }
 }
