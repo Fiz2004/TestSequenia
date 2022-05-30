@@ -1,5 +1,7 @@
 package com.fiz.testsequenia.data.data_sources.remote.dto
 
+import com.fiz.testsequenia.domain.models.Genre
+import com.fiz.testsequenia.domain.models.Movie
 import com.squareup.moshi.Json
 
 data class MovieDto(
@@ -12,3 +14,22 @@ data class MovieDto(
     val description: String?,
     val genres: List<String?>?
 )
+
+fun MovieDto.toMovie(): Movie {
+    return Movie(
+        id = id ?: 0,
+        localizedName = localizedName.orEmpty(),
+        name = name.orEmpty(),
+        year = year ?: 0,
+        rating = rating,
+        imageUrl = imageUrl,
+        description = description.orEmpty(),
+        genres = genres?.mapNotNull { it } ?: listOf()
+    )
+}
+
+fun String.toGenre(): Genre {
+    return Genre(
+        name = this
+    )
+}
