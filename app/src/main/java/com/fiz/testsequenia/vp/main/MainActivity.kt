@@ -1,7 +1,7 @@
-package com.fiz.testsequenia.view
+package com.fiz.testsequenia.vp.main
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.fiz.testsequenia.R
 
 class MainActivity : AppCompatActivity() {
