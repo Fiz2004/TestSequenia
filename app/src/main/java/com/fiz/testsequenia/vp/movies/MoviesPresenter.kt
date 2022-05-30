@@ -18,7 +18,7 @@ class MoviesPresenter(
 
     private var genres: List<Genre> = listOf()
     private var movies: List<Movie> = listOf()
-    private var isLocalCashLoaded: Boolean = false
+    override var refreshItemVisible: Boolean = false
 
     var genreSelected: Genre? = null
         set(value) {
@@ -39,16 +39,16 @@ class MoviesPresenter(
         return genreSelected?.name
     }
 
-    override fun loadMovies() {
+    override fun loadMovies(fetchFromRemote: Boolean) {
         scope.launch {
             view.setStateLoading(value = true)
-            val resultLoad = moviesRepository.loadData()
+            val resultLoad = moviesRepository.loadData(fetchFromRemote)
             resultLoad.data?.let { setupData(it) }
             view.setStateLoading(value = false)
 
             when (resultLoad) {
                 is Resource.Success -> {
-                    isLocalCashLoaded = false
+                    refreshItemVisible = false
                     view.setStateShowMovies(
                         getListDataItem(
                             this@MoviesPresenter.movies,
@@ -58,8 +58,20 @@ class MoviesPresenter(
                     )
                 }
 
+                is Resource.SuccessOnlyLocal -> {
+                    refreshItemVisible = true
+                    view.setStateShowLocalMovies(
+                        getListDataItem(
+                            this@MoviesPresenter.movies,
+                            genres,
+                            genreSelected
+                        ),
+                        resultLoad.message
+                    )
+                }
+
                 is Resource.Error -> {
-                    isLocalCashLoaded = false
+                    refreshItemVisible = true
                     view.setStateFullError(
                         resultLoad.message
                     )

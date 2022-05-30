@@ -39,8 +39,6 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     private var _binding: FragmentMoviesBinding? = null
     private val binding get() = _binding!!
 
-    var refreshItemVisible: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
@@ -55,22 +53,22 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         inflater.inflate(R.menu.top_menu, menu)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.refresh -> {
+                moviesPresenter.loadMovies(fetchFromRemote = true)
+                true
+            }
+            else -> false
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.refresh -> {
-                moviesPresenter.loadMovies()
-                true
-            }
-            else -> false
-        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,7 +84,7 @@ class MoviesFragment : Fragment(), MoviesContract.View {
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         val item = menu.findItem(R.id.refresh)
-        item.isVisible = refreshItemVisible
+        item.isVisible = moviesPresenter.refreshItemVisible
         super.onPrepareOptionsMenu(menu)
     }
 
@@ -97,13 +95,9 @@ class MoviesFragment : Fragment(), MoviesContract.View {
             View.GONE
 
         binding.circularProgressIndicator.visibility = visibility
-
-        refreshItemVisible = false
-        requireActivity().invalidateOptionsMenu()
     }
 
     override fun setStateShowMovies(dataItem: List<DataItem>) {
-        refreshItemVisible = false
         requireActivity().invalidateOptionsMenu()
 
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
@@ -121,8 +115,20 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         binding.moviesRecyclerView.layoutManager?.onRestoreInstanceState(state)
     }
 
+    override fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?) {
+        requireActivity().invalidateOptionsMenu()
+
+        setStateShowMovies(dataItem)
+
+        if (context != null)
+            Toast.makeText(
+                context,
+                message ?: getString(R.string.networkErrorCashEnabled),
+                Toast.LENGTH_LONG
+            ).show()
+    }
+
     override fun setStateFullError(message: String?) {
-        refreshItemVisible = true
         requireActivity().invalidateOptionsMenu()
 
         binding.moviesRecyclerView.visibility = View.GONE

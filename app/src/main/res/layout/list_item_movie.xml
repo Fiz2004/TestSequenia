@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/MyApp.MaterialCardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    style="@style/MyApp.MaterialCardView"
     android:layout_margin="@dimen/medium">
 
     <ImageView
@@ -20,11 +20,11 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_gravity="bottom|center"
-        android:alpha="0.5"
-        android:background="?attr/colorPrimary"
         android:ellipsize="end"
         android:gravity="center"
-        android:maxLines="2"
+        android:alpha="0.5"
+        android:background="?attr/colorPrimary"
         android:textColor="?attr/colorOnSurface"
+        android:maxLines="2"
         android:textSize="@dimen/H6" />
 </com.google.android.material.card.MaterialCardView>
