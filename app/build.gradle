@@ -33,7 +33,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    namespace 'com.fiz.testsequenia'
+    namespace "com.fiz.testsequenia"
 }
 
 dependencies {
@@ -54,6 +54,10 @@ dependencies {
     // Moshi
     implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+
+    // Coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.2")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
