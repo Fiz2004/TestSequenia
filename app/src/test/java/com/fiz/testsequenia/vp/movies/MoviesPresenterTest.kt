@@ -112,7 +112,7 @@ class MoviesPresenterTest {
             launch(Dispatchers.Main) {
                 moviesPresenter.loadMovies()
 
-                verify(view, times(1)).setStateShowMovies(anyOrNull())
+                verify(view, times(1)).setStateShowMovies(anyOrNull(), any())
             }
         }
     }
@@ -167,7 +167,7 @@ class MoviesPresenterTest {
         val selectedGenre = Genre("Выбранный жанр")
         moviesPresenter.clickGenre(selectedGenre)
 
-        verify(view, times(1)).setStateShowMovies(any())
+        verify(view, times(1)).setStateShowMovies(any(), any())
     }
 
     @Test

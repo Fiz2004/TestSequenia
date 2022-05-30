@@ -9,7 +9,7 @@ interface MoviesContract {
         fun moveMovieDetails(id: Int)
 
         fun setStateLoading(value: Boolean)
-        fun setStateShowMovies(dataItem: List<DataItem>)
+        fun setStateShowMovies(dataItem: List<DataItem>, refreshVisible: Boolean = false)
         fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?)
 
         fun setStateFullError(message: String?)
@@ -24,7 +24,7 @@ interface MoviesContract {
 
         fun getGenreSelectedName(): String?
 
-        fun loadMovies()
+        fun loadMovies(fetchFromRemote: Boolean = false)
 
         fun cleanUp()
 

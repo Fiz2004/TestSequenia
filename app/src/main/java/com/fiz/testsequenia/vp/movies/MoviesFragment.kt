@@ -2,9 +2,7 @@ package com.fiz.testsequenia.vp.movies
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -41,13 +39,20 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     private var _binding: FragmentMoviesBinding? = null
     private val binding get() = _binding!!
 
+    var refreshItemVisible: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
 
         state = savedInstanceState?.getParcelable(RECYCLER_VIEW_STATE)
 
         val genreSelected = savedInstanceState?.getString(KEY_GENRE_SELECTED)
         moviesPresenter.loadGenreSelected(genreSelected)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.top_menu, menu)
     }
 
     override fun onCreateView(
@@ -56,6 +61,16 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     ): View {
         _binding = FragmentMoviesBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.refresh -> {
+                moviesPresenter.loadMovies(fetchFromRemote = true)
+                true
+            }
+            else -> false
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -67,10 +82,12 @@ class MoviesFragment : Fragment(), MoviesContract.View {
         binding.moviesRecyclerView.layoutManager = GridLayoutManager(activity, 2)
 
         moviesPresenter.loadMovies()
+    }
 
-        binding.repeat.setOnClickListener {
-            moviesPresenter.loadMovies()
-        }
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        val item = menu.findItem(R.id.refresh)
+        item.isVisible = refreshItemVisible
+        super.onPrepareOptionsMenu(menu)
     }
 
     override fun setStateLoading(value: Boolean) {
@@ -80,10 +97,15 @@ class MoviesFragment : Fragment(), MoviesContract.View {
             View.GONE
 
         binding.circularProgressIndicator.visibility = visibility
-        binding.repeat.visibility = View.GONE
+
+        refreshItemVisible = false
+        requireActivity().invalidateOptionsMenu()
     }
 
-    override fun setStateShowMovies(dataItem: List<DataItem>) {
+    override fun setStateShowMovies(dataItem: List<DataItem>, refreshVisible: Boolean) {
+        refreshItemVisible = refreshVisible
+        requireActivity().invalidateOptionsMenu()
+
         val state = binding.moviesRecyclerView.layoutManager?.onSaveInstanceState()
 
         adapter.submitList(dataItem)
@@ -100,9 +122,10 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     }
 
     override fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?) {
-        binding.repeat.visibility = View.GONE
+        refreshItemVisible = true
+        requireActivity().invalidateOptionsMenu()
 
-        setStateShowMovies(dataItem)
+        setStateShowMovies(dataItem, true)
 
         if (context != null)
             Toast.makeText(
@@ -113,7 +136,9 @@ class MoviesFragment : Fragment(), MoviesContract.View {
     }
 
     override fun setStateFullError(message: String?) {
-        binding.repeat.visibility = View.VISIBLE
+        refreshItemVisible = true
+        requireActivity().invalidateOptionsMenu()
+
         binding.moviesRecyclerView.visibility = View.GONE
         if (context != null)
             Toast.makeText(

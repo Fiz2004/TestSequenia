@@ -19,27 +19,33 @@ class MoviesRepositoryImpl @Inject constructor(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : MoviesRepository {
     override var movies: List<Movie>? = null; private set
+    var isLoadRemote: Boolean = false
 
-    override suspend fun loadData(): Resource<List<Movie>?> = withContext(dispatcher) {
+    override suspend fun loadData(fetchFromRemote: Boolean): Resource<List<Movie>?> =
+        withContext(dispatcher) {
 
-        if (movies.isNullOrEmpty()) {
-            val response = try {
-                moviesApi.fetchMovies()
-            } catch (e: Exception) {
+            if (movies.isNullOrEmpty() || fetchFromRemote) {
+                val response = try {
+                    moviesApi.fetchMovies()
+                } catch (e: Exception) {
+                    movies = movieDatabase.dao.getAll().map { it.toMovie() }
+                    return@withContext if (movies.isNullOrEmpty())
+                        Resource.Error(e.message.toString())
+                    else
+                        Resource.SuccessOnlyLocal(movies)
+                }
+                movies = response.films?.mapNotNull { it }?.map { it.toMovie() }
+                movies?.let {
+                    movieDatabase.dao.clearAll()
+                    movieDatabase.dao.insertAll(it.map { movie -> movie.toMovieEntity() })
+                }
                 movies = movieDatabase.dao.getAll().map { it.toMovie() }
-                return@withContext if (movies.isNullOrEmpty())
-                    Resource.Error(e.message.toString())
-                else
-                    Resource.SuccessOnlyLocal(movies)
+                isLoadRemote = true
             }
-            movies = response.films?.mapNotNull { it }?.map { it.toMovie() }
-            movies?.let {
-                movieDatabase.dao.clearAll()
-                movieDatabase.dao.insertAll(it.map { movie -> movie.toMovieEntity() })
-            }
-            movies = movieDatabase.dao.getAll().map { it.toMovie() }
-        }
 
-        return@withContext Resource.Success(movies)
-    }
+            return@withContext if (isLoadRemote)
+                Resource.Success(movies)
+            else
+                Resource.SuccessOnlyLocal(movies)
+        }
 }

@@ -20,12 +20,17 @@ class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
     @Inject
     lateinit var moviesRepository: MoviesRepository
 
-    private val movieDetailsPresenter: MovieDetailsPresenter by lazy {
+    private val movieDetailsPresenter: MovieDetailsContract.Presenter by lazy {
         MovieDetailsPresenter(this, moviesRepository)
     }
 
     private var _binding: FragmentMovieDetailsBinding? = null
     private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +71,7 @@ class MovieDetailsFragment : Fragment(), MovieDetailsContract.View {
 
         binding.nameTextView.text = name
 
-        val toolbar = requireActivity().findViewById<Toolbar>(R.id.appBarLayout)
+        val toolbar = requireActivity().findViewById<Toolbar>(R.id.mainToolbar)
         toolbar.title = localizedName
     }
 

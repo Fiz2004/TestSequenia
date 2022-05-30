@@ -6,5 +6,5 @@ import com.fiz.testsequenia.utils.Resource
 interface MoviesRepository {
     val movies: List<Movie>?
 
-    suspend fun loadData(): Resource<List<Movie>?>
+    suspend fun loadData(fetchFromRemote: Boolean = false): Resource<List<Movie>?>
 }

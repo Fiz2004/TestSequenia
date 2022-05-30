@@ -9,5 +9,7 @@
     <string name="repeatButton">Повторить запрос</string>
     <string name="networkErrorCashEnabled">Сетевой запрос закончился ошибкой, Загружены данные из кэша</string>
     <string name="networkErrorCashDisabled">Сетевой запрос закончился ошибкой</string>
+    <string name="refresh">Обновить</string>
+    <string name="content_description_refresh">Обновить</string>
 
 </resources>
