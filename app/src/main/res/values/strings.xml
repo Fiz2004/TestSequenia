@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">TestSequenia</string>
+    <string name="year">Год: %1$d</string>
+    <string name="rating">Рейтинг: %1$.3f</string>
+    <string name="genres">Жанры</string>
+    <string name="movies">Фильмы</string>
+    <string name="image_movie">Изображение фильма</string>
+    <string name="main">Главная</string>
+    <string name="repeatButton">Повторить запрос</string>
+    <string name="networkErrorCashEnabled">Сетевой запрос закончился ошибкой, Загружены данные из кэша</string>
+    <string name="networkErrorCashDisabled">Сетевой запрос закончился ошибкой</string>
+    <string name="refresh">Обновить</string>
+    <string name="content_description_refresh">Обновить</string>
+
 </resources>
