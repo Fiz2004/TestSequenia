@@ -26,7 +26,7 @@
         android:indeterminate="true"
         android:visibility="visible"
         app:hideAnimationBehavior="inward"
-        app:indicatorColor="@color/md_theme_light_onPrimary"
+        app:indicatorColor="?attr/colorOnPrimary"
         app:indicatorDirectionCircular="clockwise"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

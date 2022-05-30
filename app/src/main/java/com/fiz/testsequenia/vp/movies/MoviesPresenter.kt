@@ -18,7 +18,7 @@ class MoviesPresenter(
 
     private var genres: List<Genre> = listOf()
     private var movies: List<Movie> = listOf()
-    private var isLocalCashLoaded: Boolean = false
+    override var refreshItemVisible: Boolean = false
 
     var genreSelected: Genre? = null
         set(value) {
@@ -48,7 +48,7 @@ class MoviesPresenter(
 
             when (resultLoad) {
                 is Resource.Success -> {
-                    isLocalCashLoaded = false
+                    refreshItemVisible = false
                     view.setStateShowMovies(
                         getListDataItem(
                             this@MoviesPresenter.movies,
@@ -59,7 +59,7 @@ class MoviesPresenter(
                 }
 
                 is Resource.SuccessOnlyLocal -> {
-                    isLocalCashLoaded = true
+                    refreshItemVisible = true
                     view.setStateShowLocalMovies(
                         getListDataItem(
                             this@MoviesPresenter.movies,
@@ -71,7 +71,7 @@ class MoviesPresenter(
                 }
 
                 is Resource.Error -> {
-                    isLocalCashLoaded = false
+                    refreshItemVisible = true
                     view.setStateFullError(
                         resultLoad.message
                     )

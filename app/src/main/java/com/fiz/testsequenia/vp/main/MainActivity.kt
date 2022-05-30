@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.mainToolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-//        setupActionBarWithNavController(navController,appBarConfiguration)
         binding.mainToolbar
             .setupWithNavController(navController, appBarConfiguration)
     }

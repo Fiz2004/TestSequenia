@@ -9,9 +9,8 @@ interface MoviesContract {
         fun moveMovieDetails(id: Int)
 
         fun setStateLoading(value: Boolean)
-        fun setStateShowMovies(dataItem: List<DataItem>, refreshVisible: Boolean = false)
+        fun setStateShowMovies(dataItem: List<DataItem>)
         fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?)
-
         fun setStateFullError(message: String?)
 
         fun clickMovie(id: Int)
@@ -19,6 +18,7 @@ interface MoviesContract {
     }
 
     interface Presenter {
+        var refreshItemVisible: Boolean
 
         fun loadGenreSelected(genreSelected: String?)
 
