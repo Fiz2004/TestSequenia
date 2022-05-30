@@ -39,32 +39,3 @@ sealed class DataItem {
         }
     }
 }
-
-
-class DataDiffCallback(private val oldList: List<DataItem>, private val newList: List<DataItem>) :
-    DiffUtil.Callback() {
-    override fun getOldListSize() = oldList.size
-
-    override fun getNewListSize() = newList.size
-
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return when {
-            oldList[oldItemPosition] is DataItem.HeaderItem && newList[newItemPosition] is DataItem.HeaderItem ->
-                (oldList[oldItemPosition] as DataItem.HeaderItem).title == (newList[newItemPosition] as DataItem.HeaderItem).title
-
-            oldList[oldItemPosition] is DataItem.GenreItem && newList[newItemPosition] is DataItem.GenreItem ->
-                (oldList[oldItemPosition] as DataItem.GenreItem).genre == (newList[newItemPosition] as DataItem.GenreItem).genre
-
-            oldList[oldItemPosition] is DataItem.MovieItem && newList[newItemPosition] is DataItem.MovieItem ->
-                (oldList[oldItemPosition] as DataItem.MovieItem).movie.id == (newList[newItemPosition] as DataItem.MovieItem).movie.id
-
-            else ->
-                false
-        }
-    }
-
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition] === newList[newItemPosition]
-    }
-
-}

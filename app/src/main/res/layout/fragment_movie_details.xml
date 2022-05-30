@@ -15,7 +15,7 @@
             android:id="@+id/imageUrl"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_margin="@dimen/large"
             android:adjustViewBounds="true"
             android:contentDescription="@string/image_movie"
             app:layout_constraintStart_toStartOf="parent"
@@ -24,50 +24,52 @@
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/nameTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/large"
             android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="name wrap_contentwrap_contentwrap_contentwrap_contentwrap_content" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/yearTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/large"
             android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
-            app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/nameTextView"
+            tools:text="2022" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/ratingTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:textAlignment="viewStart"
+            android:layout_margin="@dimen/large"
             android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/imageUrl"
-            app:layout_constraintTop_toBottomOf="@+id/yearTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/yearTextView"
+            tools:text="1.0" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/descriptionTextView"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:padding="16dp"
+            android:layout_margin="@dimen/large"
+            android:layout_marginEnd="235dp"
+            android:padding="@dimen/large"
             android:singleLine="false"
             android:textColor="?attr/colorOnPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageUrl" />
+            app:layout_constraintTop_toBottomOf="@+id/imageUrl"
+            tools:text="descriptionTextView" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

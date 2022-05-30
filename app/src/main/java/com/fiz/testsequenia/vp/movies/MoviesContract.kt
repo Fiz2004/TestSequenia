@@ -11,7 +11,6 @@ interface MoviesContract {
         fun setStateLoading(value: Boolean)
         fun setStateShowMovies(dataItem: List<DataItem>)
         fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?)
-
         fun setStateFullError(message: String?)
 
         fun clickMovie(id: Int)
@@ -19,12 +18,13 @@ interface MoviesContract {
     }
 
     interface Presenter {
+        var refreshItemVisible: Boolean
 
         fun loadGenreSelected(genreSelected: String?)
 
         fun getGenreSelectedName(): String?
 
-        fun loadMovies()
+        fun loadMovies(fetchFromRemote: Boolean = false)
 
         fun cleanUp()
 

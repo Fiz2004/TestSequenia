@@ -18,6 +18,7 @@ class MoviesPresenter(
 
     private var genres: List<Genre> = listOf()
     private var movies: List<Movie> = listOf()
+    override var refreshItemVisible: Boolean = false
 
     var genreSelected: Genre? = null
         set(value) {
@@ -38,34 +39,43 @@ class MoviesPresenter(
         return genreSelected?.name
     }
 
-    override fun loadMovies() {
+    override fun loadMovies(fetchFromRemote: Boolean) {
         scope.launch {
             view.setStateLoading(value = true)
-            val resultLoad = moviesRepository.loadData()
+            val resultLoad = moviesRepository.loadData(fetchFromRemote)
             resultLoad.data?.let { setupData(it) }
             view.setStateLoading(value = false)
 
             when (resultLoad) {
-                is Resource.Success -> view.setStateShowMovies(
-                    getListDataItem(
-                        this@MoviesPresenter.movies,
-                        genres,
-                        genreSelected
+                is Resource.Success -> {
+                    refreshItemVisible = false
+                    view.setStateShowMovies(
+                        getListDataItem(
+                            this@MoviesPresenter.movies,
+                            genres,
+                            genreSelected
+                        )
                     )
-                )
+                }
 
-                is Resource.SuccessOnlyLocal -> view.setStateShowLocalMovies(
-                    getListDataItem(
-                        this@MoviesPresenter.movies,
-                        genres,
-                        genreSelected
-                    ),
-                    resultLoad.message
-                )
+                is Resource.SuccessOnlyLocal -> {
+                    refreshItemVisible = true
+                    view.setStateShowLocalMovies(
+                        getListDataItem(
+                            this@MoviesPresenter.movies,
+                            genres,
+                            genreSelected
+                        ),
+                        resultLoad.message
+                    )
+                }
 
-                is Resource.Error -> view.setStateFullError(
-                    resultLoad.message
-                )
+                is Resource.Error -> {
+                    refreshItemVisible = true
+                    view.setStateFullError(
+                        resultLoad.message
+                    )
+                }
             }
         }
     }
