@@ -106,11 +106,11 @@ class MoviesPresenter(
         scope.cancel()
     }
 
-    override fun clickMovie(id: Int) {
-        view.moveMovieDetails(id)
+    override fun clickMovieCard(id: Int) {
+        view.navigateToMovieDetails(id)
     }
 
-    override fun clickGenre(genre: Genre?) {
+    override fun clickGenreButton(genre: Genre?) {
         genre?.let {
             genreSelected = it
         }

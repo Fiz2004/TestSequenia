@@ -6,15 +6,12 @@ import com.fiz.testsequenia.vp.models.DataItem
 interface MoviesContract {
 
     interface View {
-        fun moveMovieDetails(id: Int)
+        fun navigateToMovieDetails(id: Int)
 
         fun setStateLoading(value: Boolean)
         fun setStateShowMovies(dataItem: List<DataItem>)
         fun setStateShowLocalMovies(dataItem: List<DataItem>, message: String?)
         fun setStateFullError(message: String?)
-
-        fun clickMovie(id: Int)
-        fun clickGenre(genre: Genre)
     }
 
     interface Presenter {
@@ -28,9 +25,9 @@ interface MoviesContract {
 
         fun cleanUp()
 
-        fun clickMovie(id: Int)
+        fun clickMovieCard(id: Int)
 
-        fun clickGenre(genre: Genre?)
+        fun clickGenreButton(genre: Genre?)
 
         fun getSpanSize(dataItem: List<DataItem>, position: Int): Int
     }

@@ -16,9 +16,7 @@ interface MovieDetailsContract {
     }
 
     interface Presenter {
-
         fun start(id: Int)
-
         fun load()
     }
 

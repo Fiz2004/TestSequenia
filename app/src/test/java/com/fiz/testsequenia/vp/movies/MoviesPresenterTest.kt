@@ -12,6 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.*
 
+@Suppress("OPT_IN_IS_NOT_ENABLED")
 class MoviesPresenterTest {
 
     private lateinit var view: MoviesContract.View
@@ -105,14 +106,14 @@ class MoviesPresenterTest {
     fun whenLoadData_ReturnSuccess_shouldSetStateShowMovies() {
 
         moviesRepository.stub {
-            onBlocking { loadData() }.doReturn(Resource.Success(listOf<Movie>()))
+            onBlocking { loadData() }.doReturn(Resource.Success(listOf()))
         }
 
         runTest {
             launch(Dispatchers.Main) {
                 moviesPresenter.loadMovies()
 
-                verify(view, times(1)).setStateShowMovies(anyOrNull(), any())
+                verify(view, times(1)).setStateShowMovies(anyOrNull())
             }
         }
     }
@@ -157,23 +158,23 @@ class MoviesPresenterTest {
     @Test
     fun whenClickMovie_shouldInformViewMoveMovieDetailsByID() {
         val id = 0
-        moviesPresenter.clickMovie(id)
+        moviesPresenter.clickMovieCard(id)
 
-        verify(view, times(1)).moveMovieDetails(id)
+        verify(view, times(1)).navigateToMovieDetails(id)
     }
 
     @Test
     fun whenClickGenre_shouldInformViewSetNewState() {
         val selectedGenre = Genre("Выбранный жанр")
-        moviesPresenter.clickGenre(selectedGenre)
+        moviesPresenter.clickGenreButton(selectedGenre)
 
-        verify(view, times(1)).setStateShowMovies(any(), any())
+        verify(view, times(1)).setStateShowMovies(any())
     }
 
     @Test
     fun whenClickGenre_shouldSetGenreSelect() {
         val selectedGenre = Genre("Выбранный жанр")
-        moviesPresenter.clickGenre(selectedGenre)
+        moviesPresenter.clickGenreButton(selectedGenre)
 
         Assert.assertEquals(selectedGenre, moviesPresenter.genreSelected)
     }
@@ -181,8 +182,8 @@ class MoviesPresenterTest {
     @Test
     fun whenClickGenreRepeat_shouldUnSelectedGenreSelect() {
         val selectedGenre = Genre("Выбранный жанр")
-        moviesPresenter.clickGenre(selectedGenre)
-        moviesPresenter.clickGenre(selectedGenre)
+        moviesPresenter.clickGenreButton(selectedGenre)
+        moviesPresenter.clickGenreButton(selectedGenre)
 
         Assert.assertNull(moviesPresenter.genreSelected)
     }
@@ -191,8 +192,8 @@ class MoviesPresenterTest {
     fun whenClickGenreAnother_shouldSetGenreSelect() {
         val firstSelectedGenre = Genre("Выбранный жанр")
         val secondSelectedGenre = Genre("Новый выбранный жанр")
-        moviesPresenter.clickGenre(firstSelectedGenre)
-        moviesPresenter.clickGenre(secondSelectedGenre)
+        moviesPresenter.clickGenreButton(firstSelectedGenre)
+        moviesPresenter.clickGenreButton(secondSelectedGenre)
 
         Assert.assertEquals(secondSelectedGenre, moviesPresenter.genreSelected)
     }

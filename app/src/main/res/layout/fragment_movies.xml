@@ -25,6 +25,7 @@
         android:layout_height="wrap_content"
         android:indeterminate="true"
         android:visibility="visible"
+        android:saveEnabled="true"
         app:hideAnimationBehavior="inward"
         app:indicatorColor="?attr/colorOnPrimary"
         app:indicatorDirectionCircular="clockwise"

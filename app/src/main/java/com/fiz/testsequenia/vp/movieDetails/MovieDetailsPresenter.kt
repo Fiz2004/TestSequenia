@@ -13,7 +13,6 @@ class MovieDetailsPresenter(
         movie = moviesRepository.movies?.first { id == it.id }
     }
 
-
     override fun load() {
         movie?.let {
             view.updateUI(
